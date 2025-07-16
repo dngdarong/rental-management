@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Rooms</title>
+    <title>Manage Rents</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -108,6 +108,41 @@
         .modal-footer button:hover {
             background-color: #4338ca;
         }
+        .navbar {
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        /* Dropdown specific styles */
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #ffffff;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            top: calc(100% + 0.5rem); /* Position below the avatar */
+        }
+        .dropdown-menu.show {
+            display: block;
+        }
+        .dropdown-menu a, .dropdown-menu button {
+            color: #333;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            text-align: left;
+            width: 100%;
+            border: none;
+            background: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .dropdown-menu a:hover, .dropdown-menu button:hover {
+            background-color: #f1f1f1;
+        }
     </style>
 </head>
 <body class="flex min-h-screen"
@@ -185,30 +220,24 @@
     <div class="flex-1 flex flex-col">
         <!-- Top Navbar -->
         <header class="navbar p-4 flex justify-between items-center relative">
-            <h1 class="text-2xl font-semibold text-gray-800">Manage Rooms</h1> {{-- Dynamic title --}}
+            <h1 class="text-2xl font-semibold text-gray-800">Manage Rents</h1> {{-- Dynamic title --}}
             
             <div class="relative">
                 <button id="profileDropdownToggle" class="flex items-center space-x-2 focus:outline-none">
-                    @if(Auth::user()->profile_image_url)
-                        <img src="{{ Auth::user()->profile_image_url }}" alt="Profile Avatar" class="w-10 h-10 rounded-full object-cover">
-                    @else
-                        <span class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-bold">
-                            {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                        </span>
-                    @endif
+                    <img src="{{ Auth::user()->profile_image_url }}" alt="Profile Avatar" class="w-10 h-10 rounded-full object-cover">
                     <span class="text-gray-800 font-medium hidden md:block">{{ Auth::user()->name }}</span>
                     <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                 </button>
 
-                <div id="profileDropdownMenu" class="dropdown-menu" style="display: none; position: absolute; right: 0; top: 100%; background: #fff; border-radius: 0.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); min-width: 180px; z-index: 10;">
+                <div id="profileDropdownMenu" class="dropdown-menu">
                     <div class="px-4 py-2 text-sm text-gray-700 border-b border-gray-200">
                         <div class="font-medium">{{ Auth::user()->name }}</div>
                         <div class="text-gray-500">{{ Auth::user()->email }}</div>
                     </div>
-                    <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b">Settings</a>
+                    <a href="{{ route('profile.edit') }}">Settings</a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b">Logout</button>
+                        <button type="submit">Logout</button>
                     </form>
                 </div>
             </div>
@@ -217,8 +246,8 @@
         <!-- Page Content -->
         <main class="flex-1 p-6 bg-gray-100">
             <div class="flex justify-end mb-6">
-                <a href="{{ route('admin.rooms.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                    Add New Room
+                <a href="{{ route('admin.rents.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                    Add New Rent Record
                 </a>
             </div>
 
@@ -227,31 +256,35 @@
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="table-header">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-lg">Room Number</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Room Type</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-lg">Tenant</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Room</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Month</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            @forelse ($rooms as $room)
+                            @forelse ($rents as $rent)
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $room->room_number }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $room->roomType->name }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${{ number_format($room->price, 2) }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $rent->tenant->full_name }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $rent->room->room_number }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $rent->month->format('M Y') }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${{ number_format($rent->amount, 2) }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm">
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                                            @if($room->status == 'available') bg-green-100 text-green-800
-                                            @elseif($room->status == 'occupied') bg-red-100 text-red-800
+                                            @if($rent->status == 'Paid') bg-green-100 text-green-800
+                                            @elseif($rent->status == 'Due') bg-red-100 text-red-800
                                             @else bg-yellow-100 text-yellow-800 @endif">
-                                            {{ Str::title(Str::replace('_', ' ', $room->status)) }}
+                                            {{ $rent->status }}
                                         </span>
                                     </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $rent->due_date->format('M d, Y') }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <a href="{{ route('admin.rooms.edit', $room) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
-                                        <button type="button" onclick="confirmDelete('{{ $room->id }}')" class="text-red-600 hover:text-red-900">Delete</button>
-                                        <form id="delete-form-{{ $room->id }}" action="{{ route('admin.rooms.destroy', $room) }}" method="POST" style="display: none;">
+                                        <a href="{{ route('admin.rents.edit', $rent) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
+                                        <button type="button" onclick="confirmDelete('{{ $rent->id }}')" class="text-red-600 hover:text-red-900">Delete</button>
+                                        <form id="delete-form-{{ $rent->id }}" action="{{ route('admin.rents.destroy', $rent) }}" method="POST" style="display: none;">
                                             @csrf
                                             @method('DELETE')
                                         </form>
@@ -259,14 +292,14 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No rooms found.</td>
+                                    <td colspan="7" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No rent records found.</td>
                                 </tr>
                             @endforelse
                         </tbody>
                     </table>
                 </div>
                 <div class="mt-4 pagination-links">
-                    {{ $rooms->links() }}
+                    {{ $rents->links() }}
                 </div>
             </div>
         </main>
@@ -287,7 +320,7 @@
     <div id="confirmDeleteModal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">Confirm Deletion</div>
-            <div class="modal-body">Are you sure you want to delete this room? This action cannot be undone.</div>
+            <div class="modal-body">Are you sure you want to delete this rent record? This action cannot be undone.</div>
             <div class="modal-footer flex justify-center">
                 <button id="cancelDelete" class="cancel-btn">Cancel</button>
                 <button id="confirmDelete" class="primary-button">Delete</button>
@@ -339,18 +372,15 @@
             const profileDropdownMenu = document.getElementById('profileDropdownMenu');
 
             if (profileDropdownToggle && profileDropdownMenu) {
-                profileDropdownToggle.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    if (profileDropdownMenu.style.display === 'block') {
-                        profileDropdownMenu.style.display = 'none';
-                    } else {
-                        profileDropdownMenu.style.display = 'block';
-                    }
+                profileDropdownToggle.addEventListener('click', function() {
+                    profileDropdownMenu.classList.toggle('show');
                 });
 
                 window.addEventListener('click', function(event) {
                     if (!profileDropdownToggle.contains(event.target) && !profileDropdownMenu.contains(event.target)) {
-                        profileDropdownMenu.style.display = 'none';
+                        if (profileDropdownMenu.classList.contains('show')) {
+                            profileDropdownMenu.classList.remove('show');
+                        }
                     }
                 });
             }
@@ -361,8 +391,8 @@
             const confirmDeleteBtn = document.getElementById('confirmDelete');
             let formToSubmit = null; // To store the form reference
 
-            window.confirmDelete = function(roomId) { // Changed parameter name to roomId
-                formToSubmit = document.getElementById('delete-form-' + roomId);
+            window.confirmDelete = function(rentId) { // Changed parameter name to rentId
+                formToSubmit = document.getElementById('delete-form-' + rentId);
                 confirmDeleteModal.classList.add('show');
             }
 

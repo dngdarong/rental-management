@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Admin Tenant</title>
+    <title>Create Rent Record</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -14,10 +14,12 @@
         .sidebar a.active { background-color: #4a5568; color: #ffffff; }
         .card { background-color: #ffffff; border-radius: 0.75rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
         .navbar { background-color: #ffffff; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); }
-        /* Input styling for consistency */
+        /* Input and Select styling for consistency */
         input[type="text"]:focus,
-        input[type="email"]:focus,
-        input[type="password"]:focus {
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        input[type="datetime-local"]:focus, /* For paid_at */
+        select:focus {
             border-color: #4f46e5; /* Indigo-600 */
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5); /* Indigo-500 with transparency */
         }
@@ -82,6 +84,12 @@
                         </a>
                     </li>
                     <li class="mb-2">
+                        <a href="{{ route('admin.admin-tenants.index') }}" class="flex items-center space-x-3 {{ request()->routeIs('admin.admin-tenants.*') ? 'active' : '' }}">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a4 4 0 00-4-4H9a4 4 0 00-4 4v1h10zm-9-9a4 4 0 110 5.292"></path></svg>
+                            <span>Add Admins</span> 
+                        </a>
+                    </li>
+                    <li class="mb-2">
                         <a href="{{ route('admin.rooms.index') }}" class="flex items-center space-x-3 {{ request()->routeIs('admin.rooms.*') ? 'active' : '' }}">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                             <span>Rooms</span>
@@ -134,7 +142,7 @@
     <div class="flex-1 flex flex-col">
         <!-- Top Navbar -->
         <header class="navbar p-4 flex justify-between items-center relative">
-            <h1 class="text-2xl font-semibold text-gray-800">Edit Admin Tenant</h1> {{-- Dynamic title --}}
+            <h1 class="text-2xl font-semibold text-gray-800">Create Rent Record</h1> {{-- Dynamic title --}}
             
             <div class="relative">
                 <button id="profileDropdownToggle" class="flex items-center space-x-2 focus:outline-none">
@@ -160,44 +168,87 @@
         <!-- Page Content -->
         <main class="flex-1 p-6 bg-gray-100">
             <div class="card p-6 max-w-2xl mx-auto">
-                <form method="POST" action="{{ route('admin.admin-tenants.update', $adminTenant) }}"> {{-- Corrected action to admin.admin-tenants.update --}}
+                <form method="POST" action="{{ route('admin.rents.store') }}">
                     @csrf
-                    @method('PUT')
 
                     <div class="mb-4">
-                        <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
-                        <input type="text" name="name" id="name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="{{ old('name', $adminTenant->name) }}" required autofocus>
-                        @error('name')
+                        <label for="tenant_id" class="block text-sm font-medium text-gray-700">Tenant</label>
+                        <select name="tenant_id" id="tenant_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                            <option value="">Select Tenant</option>
+                            @foreach ($tenants as $tenant)
+                                <option value="{{ $tenant->id }}" {{ old('tenant_id') == $tenant->id ? 'selected' : '' }}>
+                                    {{ $tenant->full_name }} (Room: {{ $tenant->room->room_number ?? 'N/A' }})
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('tenant_id')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <div class="mb-4">
-                        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                        <input type="email" name="email" id="email" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="{{ old('email', $adminTenant->email) }}" required>
-                        @error('email')
+                        <label for="room_id" class="block text-sm font-medium text-gray-700">Room</label>
+                        <select name="room_id" id="room_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                            <option value="">Select Room</option>
+                            @foreach ($rooms as $room)
+                                <option value="{{ $room->id }}" {{ old('room_id') == $room->id ? 'selected' : '' }}>
+                                    {{ $room->room_number }} ({{ Str::title(Str::replace('_', ' ', $room->status)) }}) - ${{ number_format($room->price, 2) }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('room_id')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <div class="mb-4">
-                        <label for="password" class="block text-sm font-medium text-gray-700">New Password (optional)</label>
-                        <input type="password" name="password" id="password" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" autocomplete="new-password">
-                        <p class="text-xs text-gray-500 mt-1">Leave blank to keep current password.</p>
-                        @error('password')
+                        <label for="month" class="block text-sm font-medium text-gray-700">Rent Month</label>
+                        <input type="month" name="month" id="month" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="{{ old('month', \Carbon\Carbon::now()->format('Y-m')) }}" required>
+                        @error('month')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="amount" class="block text-sm font-medium text-gray-700">Amount</label>
+                        <input type="number" name="amount" id="amount" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="{{ old('amount') }}" required min="0" step="0.01">
+                        @error('amount')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                        <select name="status" id="status" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                            <option value="Due" {{ old('status') == 'Due' ? 'selected' : '' }}>Due</option>
+                            <option value="Partial" {{ old('status') == 'Partial' ? 'selected' : '' }}>Partial</option>
+                            <option value="Paid" {{ old('status') == 'Paid' ? 'selected' : '' }}>Paid</option>
+                        </select>
+                        @error('status')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="due_date" class="block text-sm font-medium text-gray-700">Due Date</label>
+                        <input type="date" name="due_date" id="due_date" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="{{ old('due_date', \Carbon\Carbon::now()->endOfMonth()->format('Y-m-d')) }}" required>
+                        @error('due_date')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <div class="mb-6">
-                        <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Confirm New Password</label>
-                        <input type="password" name="password_confirmation" id="password_confirmation" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" autocomplete="new-password">
+                        <label for="paid_at" class="block text-sm font-medium text-gray-700">Paid At (Optional)</label>
+                        <input type="datetime-local" name="paid_at" id="paid_at" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="{{ old('paid_at') }}">
+                        @error('paid_at')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div class="flex items-center justify-end">
-                        <a href="{{ route('admin.admin-tenants.index') }}" class="text-gray-600 hover:text-gray-900 mr-4">Cancel</a>
+                        <a href="{{ route('admin.rents.index') }}" class="text-gray-600 hover:text-gray-900 mr-4">Cancel</a>
                         <button type="submit" class="primary-button">
-                            Update Admin Tenant
+                            Create Rent Record
                         </button>
                     </div>
                 </form>
