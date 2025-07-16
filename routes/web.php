@@ -4,7 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\AdminTenantController;
 use App\Http\Controllers\Admin\RoomController;
-use App\Http\Controllers\Admin\RoomTypeController; // Import RoomTypeController
+use App\Http\Controllers\Admin\RoomTypeController;
+use App\Http\Controllers\Admin\TenantController; // Import TenantController
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Auth;
 
@@ -35,14 +36,16 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // Room Management
     Route::resource('rooms', RoomController::class);
 
-    // Room Type Management - ENSURE THIS LINE IS UNCOMMENTED
+    // Room Type Management
     Route::resource('room-types', RoomTypeController::class);
+
+    // Tenant Management - ENSURE THIS LINE IS UNCOMMENTED
+    Route::resource('tenants', TenantController::class);
 
     // Admin Tenant Management (accessible only by Super Admin via Gate)
     Route::resource('admin-tenants', AdminTenantController::class);
 
     // Placeholder for other admin resource routes:
-    // Route::resource('tenants', TenantController::class);
     // Route::resource('rents', RentController::class);
     // Route::resource('payments', PaymentController::class);
     // Route::resource('maintenance-requests', MaintenanceRequestController::class);

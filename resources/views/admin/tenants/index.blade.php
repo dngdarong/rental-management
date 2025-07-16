@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Room Types</title>
+    <title>Manage Tenants</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -44,37 +44,6 @@
         .pagination-links nav span.text-gray-500 {
             opacity: 0.6;
             cursor: not-allowed;
-        }
-
-        /* Dropdown menu styles */
-        .dropdown-menu {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: 100%;
-            background: #fff;
-            min-width: 180px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            border-radius: 0.5rem;
-            z-index: 50;
-        }
-        .dropdown-menu.show {
-            display: block;
-        }
-        .dropdown-menu a, .dropdown-menu button {
-            display: block;
-            width: 100%;
-            padding: 0.75rem 1.5rem;
-            text-align: left;
-            color: #4a5568;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background 0.2s;
-        }
-        .dropdown-menu a:hover, .dropdown-menu button:hover {
-            background: #f3f4f6;
         }
 
         /* Custom Modal Styles (copied from login page for consistency) */
@@ -138,6 +107,41 @@
         }
         .modal-footer button:hover {
             background-color: #4338ca;
+        }
+        .navbar {
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        /* Dropdown specific styles */
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #ffffff;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            top: calc(100% + 0.5rem); /* Position below the avatar */
+        }
+        .dropdown-menu.show {
+            display: block;
+        }
+        .dropdown-menu a, .dropdown-menu button {
+            color: #333;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            text-align: left;
+            width: 100%;
+            border: none;
+            background: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .dropdown-menu a:hover, .dropdown-menu button:hover {
+            background-color: #f1f1f1;
         }
     </style>
 </head>
@@ -216,7 +220,7 @@
     <div class="flex-1 flex flex-col">
         <!-- Top Navbar -->
         <header class="navbar p-4 flex justify-between items-center relative">
-            <h1 class="text-2xl font-semibold text-gray-800">Manage Room Types</h1> {{-- Dynamic title --}}
+            <h1 class="text-2xl font-semibold text-gray-800">Dashboard</h1>
             
             <div class="relative">
                 <button id="profileDropdownToggle" class="flex items-center space-x-2 focus:outline-none">
@@ -242,8 +246,8 @@
         <!-- Page Content -->
         <main class="flex-1 p-6 bg-gray-100">
             <div class="flex justify-end mb-6">
-                <a href="{{ route('admin.room-types.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                    Add New Room Type
+                <a href="{{ route('admin.tenants.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                    Add New Tenant
                 </a>
             </div>
 
@@ -252,22 +256,26 @@
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="table-header">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-lg">Name</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Default Price</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-lg">Full Name</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Room</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Start Date</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            @forelse ($roomTypes as $roomType)
+                            @forelse ($tenants as $tenant)
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $roomType->name }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $roomType->description ?? 'N/A' }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${{ number_format($roomType->default_price, 2) }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $tenant->full_name }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $tenant->email ?? 'N/A' }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $tenant->phone }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $tenant->room->room_number ?? 'N/A' }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $tenant->start_date->format('M d, Y') }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <a href="{{ route('admin.room-types.edit', $roomType) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
-                                        <button type="button" onclick="confirmDelete('{{ $roomType->id }}')" class="text-red-600 hover:text-red-900">Delete</button>
-                                        <form id="delete-form-{{ $roomType->id }}" action="{{ route('admin.room-types.destroy', $roomType) }}" method="POST" style="display: none;">
+                                        <a href="{{ route('admin.tenants.edit', $tenant) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
+                                        <button type="button" onclick="confirmDelete('{{ $tenant->id }}')" class="text-red-600 hover:text-red-900">Delete</button>
+                                        <form id="delete-form-{{ $tenant->id }}" action="{{ route('admin.tenants.destroy', $tenant) }}" method="POST" style="display: none;">
                                             @csrf
                                             @method('DELETE')
                                         </form>
@@ -275,14 +283,14 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No room types found.</td>
+                                    <td colspan="6" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No tenants found.</td>
                                 </tr>
                             @endforelse
                         </tbody>
                     </table>
                 </div>
                 <div class="mt-4 pagination-links">
-                    {{ $roomTypes->links() }}
+                    {{ $tenants->links() }}
                 </div>
             </div>
         </main>
@@ -303,7 +311,7 @@
     <div id="confirmDeleteModal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">Confirm Deletion</div>
-            <div class="modal-body">Are you sure you want to delete this room type? This action cannot be undone.</div>
+            <div class="modal-body">Are you sure you want to delete this tenant? This action cannot be undone.</div>
             <div class="modal-footer flex justify-center">
                 <button id="cancelDelete" class="cancel-btn">Cancel</button>
                 <button id="confirmDelete" class="primary-button">Delete</button>
@@ -374,8 +382,8 @@
             const confirmDeleteBtn = document.getElementById('confirmDelete');
             let formToSubmit = null; // To store the form reference
 
-            window.confirmDelete = function(roomTypeId) { // Changed parameter name to roomTypeId
-                formToSubmit = document.getElementById('delete-form-' + roomTypeId);
+            window.confirmDelete = function(tenantId) { // Changed parameter name to tenantId
+                formToSubmit = document.getElementById('delete-form-' + tenantId);
                 confirmDeleteModal.classList.add('show');
             }
 
