@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Room Types</title>
+    <title>Manage Admin Tenants</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -44,37 +44,6 @@
         .pagination-links nav span.text-gray-500 {
             opacity: 0.6;
             cursor: not-allowed;
-        }
-
-        /* Dropdown menu styles */
-        .dropdown-menu {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: 100%;
-            background: #fff;
-            min-width: 180px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            border-radius: 0.5rem;
-            z-index: 50;
-        }
-        .dropdown-menu.show {
-            display: block;
-        }
-        .dropdown-menu a, .dropdown-menu button {
-            display: block;
-            width: 100%;
-            padding: 0.75rem 1.5rem;
-            text-align: left;
-            color: #4a5568;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background 0.2s;
-        }
-        .dropdown-menu a:hover, .dropdown-menu button:hover {
-            background: #f3f4f6;
         }
 
         /* Custom Modal Styles (copied from login page for consistency) */
@@ -138,6 +107,37 @@
         }
         .modal-footer button:hover {
             background-color: #4338ca;
+        }
+        /* Dropdown menu styling */
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            min-width: 180px;
+            z-index: 50;
+        }
+        .dropdown-menu.show {
+            display: block;
+        }
+        .dropdown-menu a, .dropdown-menu button {
+            display: block;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            text-align: left;
+            background: none;
+            border: none;
+            color: #4a5568;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .dropdown-menu a:hover, .dropdown-menu button:hover {
+            background-color: #f3f4f6;
         }
     </style>
 </head>
@@ -210,10 +210,11 @@
     <div class="flex-1 flex flex-col">
         <!-- Top Navbar -->
         <header class="navbar p-4 flex justify-between items-center relative">
-            <h1 class="text-2xl font-semibold text-gray-800">Manage Room Types</h1> {{-- Dynamic title --}}
+            <h1 class="text-2xl font-semibold text-gray-800">Manage Admin Tenants</h1>
             
             <div class="relative">
                 <button id="profileDropdownToggle" class="flex items-center space-x-2 focus:outline-none">
+                    {{-- Display actual profile image or fallback avatar --}}
                     <img src="{{ Auth::user()->profile_image_url }}" alt="Profile Avatar" class="w-10 h-10 rounded-full object-cover">
                     <span class="text-gray-800 font-medium hidden md:block">{{ Auth::user()->name }}</span>
                     <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -236,8 +237,8 @@
         <!-- Page Content -->
         <main class="flex-1 p-6 bg-gray-100">
             <div class="flex justify-end mb-6">
-                <a href="{{ route('admin.room-types.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                    Add New Room Type
+                <a href="{{ route('admin.admin-tenants.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                    Add New Admin Tenant
                 </a>
             </div>
 
@@ -247,21 +248,21 @@
                         <thead class="table-header">
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-lg">Name</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Default Price</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            @forelse ($roomTypes as $roomType)
+                            @forelse ($adminTenants as $adminTenant)
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $roomType->name }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $roomType->description ?? 'N/A' }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${{ number_format($roomType->default_price, 2) }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $adminTenant->name }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $adminTenant->email }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ Str::replace('_', ' ', Str::title($adminTenant->role)) }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <a href="{{ route('admin.room-types.edit', $roomType) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
-                                        <button type="button" onclick="confirmDelete('{{ $roomType->id }}')" class="text-red-600 hover:text-red-900">Delete</button>
-                                        <form id="delete-form-{{ $roomType->id }}" action="{{ route('admin.room-types.destroy', $roomType) }}" method="POST" style="display: none;">
+                                        <a href="{{ route('admin.admin-tenants.edit', $adminTenant) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
+                                        <button type="button" onclick="confirmDelete('{{ $adminTenant->id }}')" class="text-red-600 hover:text-red-900">Delete</button>
+                                        <form id="delete-form-{{ $adminTenant->id }}" action="{{ route('admin.admin-tenants.destroy', $adminTenant) }}" method="POST" style="display: none;">
                                             @csrf
                                             @method('DELETE')
                                         </form>
@@ -269,14 +270,14 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No room types found.</td>
+                                    <td colspan="4" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No admin tenants found.</td>
                                 </tr>
                             @endforelse
                         </tbody>
                     </table>
                 </div>
                 <div class="mt-4 pagination-links">
-                    {{ $roomTypes->links() }}
+                    {{ $adminTenants->links() }}
                 </div>
             </div>
         </main>
@@ -297,7 +298,7 @@
     <div id="confirmDeleteModal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">Confirm Deletion</div>
-            <div class="modal-body">Are you sure you want to delete this room type? This action cannot be undone.</div>
+            <div class="modal-body">Are you sure you want to delete this admin tenant? This action cannot be undone.</div>
             <div class="modal-footer flex justify-center">
                 <button id="cancelDelete" class="cancel-btn">Cancel</button>
                 <button id="confirmDelete" class="primary-button">Delete</button>
@@ -306,7 +307,7 @@
     </div>
 
     <script>
-        // Custom Alert Modal Logic
+        // Custom Alert Modal Logic (from login page)
         document.addEventListener('DOMContentLoaded', function() {
             const modal = document.getElementById('customAlertModal');
             const modalTitle = document.getElementById('modalTitle');
@@ -344,7 +345,7 @@
                 showAlert('Error!', sessionError);
             }
 
-            // Profile Dropdown Logic
+            // Profile Dropdown Logic (from dashboard)
             const profileDropdownToggle = document.getElementById('profileDropdownToggle');
             const profileDropdownMenu = document.getElementById('profileDropdownMenu');
 
@@ -368,8 +369,8 @@
             const confirmDeleteBtn = document.getElementById('confirmDelete');
             let formToSubmit = null; // To store the form reference
 
-            window.confirmDelete = function(roomTypeId) { // Changed parameter name to roomTypeId
-                formToSubmit = document.getElementById('delete-form-' + roomTypeId);
+            window.confirmDelete = function(adminTenantId) {
+                formToSubmit = document.getElementById('delete-form-' + adminTenantId);
                 confirmDeleteModal.classList.add('show');
             }
 
