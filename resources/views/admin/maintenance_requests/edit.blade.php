@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Rent Record</title>
+    <title>Edit Maintenance Request</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -14,11 +14,10 @@
         .sidebar a.active { background-color: #4a5568; color: #ffffff; }
         .card { background-color: #ffffff; border-radius: 0.75rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
         .navbar { background-color: #ffffff; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); }
-        /* Input and Select styling for consistency */
+        /* Input and Textarea styling for consistency */
         input[type="text"]:focus,
-        input[type="number"]:focus,
-        input[type="date"]:focus,
-        input[type="datetime-local"]:focus, /* For paid_at */
+        input[type="datetime-local"]:focus,
+        textarea:focus,
         select:focus {
             border-color: #4f46e5; /* Indigo-600 */
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5); /* Indigo-500 with transparency */
@@ -142,7 +141,7 @@
     <div class="flex-1 flex flex-col">
         <!-- Top Navbar -->
         <header class="navbar p-4 flex justify-between items-center relative">
-            <h1 class="text-2xl font-semibold text-gray-800">Edit Rent Record</h1> {{-- Dynamic title --}}
+            <h1 class="text-2xl font-semibold text-gray-800">Edit Maintenance Request</h1> {{-- Dynamic title --}}
             
             <div class="relative">
                 <button id="profileDropdownToggle" class="flex items-center space-x-2 focus:outline-none">
@@ -168,16 +167,16 @@
         <!-- Page Content -->
         <main class="flex-1 p-6 bg-gray-100">
             <div class="card p-6 max-w-2xl mx-auto">
-                <form method="POST" action="{{ route('admin.rents.update', $rent) }}">
+                <form method="POST" action="{{ route('admin.maintenance-requests.update', $maintenanceRequest) }}">
                     @csrf
                     @method('PUT')
 
                     <div class="mb-4">
-                        <label for="tenant_id" class="block text-sm font-medium text-gray-700">Tenant</label>
-                        <select name="tenant_id" id="tenant_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                        <label for="tenant_id" class="block text-sm font-medium text-gray-700">Tenant (Optional)</label>
+                        <select name="tenant_id" id="tenant_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                             <option value="">Select Tenant</option>
-                            @foreach ($tenants as $tenantOption) {{-- Changed variable name to avoid conflict --}}
-                                <option value="{{ $tenantOption->id }}" {{ old('tenant_id', $rent->tenant_id) == $tenantOption->id ? 'selected' : '' }}>
+                            @foreach ($tenants as $tenantOption)
+                                <option value="{{ $tenantOption->id }}" {{ old('tenant_id', $maintenanceRequest->tenant_id) == $tenantOption->id ? 'selected' : '' }}>
                                     {{ $tenantOption->full_name }} (Room: {{ $tenantOption->room->room_number ?? 'N/A' }})
                                 </option>
                             @endforeach
@@ -191,9 +190,9 @@
                         <label for="room_id" class="block text-sm font-medium text-gray-700">Room</label>
                         <select name="room_id" id="room_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
                             <option value="">Select Room</option>
-                            @foreach ($rooms as $roomOption) {{-- Changed variable name to avoid conflict --}}
-                                <option value="{{ $roomOption->id }}" {{ old('room_id', $rent->room_id) == $roomOption->id ? 'selected' : '' }}>
-                                    {{ $roomOption->room_number }} ({{ Str::title(Str::replace('_', ' ', $roomOption->status)) }}) - ${{ number_format($roomOption->price, 2) }}
+                            @foreach ($rooms as $roomOption)
+                                <option value="{{ $roomOption->id }}" {{ old('room_id', $maintenanceRequest->room_id) == $roomOption->id ? 'selected' : '' }}>
+                                    {{ $roomOption->room_number }} ({{ Str::title(Str::replace('_', ' ', $roomOption->status)) }})
                                 </option>
                             @endforeach
                         </select>
@@ -203,17 +202,17 @@
                     </div>
 
                     <div class="mb-4">
-                        <label for="month" class="block text-sm font-medium text-gray-700">Rent Month</label>
-                        <input type="month" name="month" id="month" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="{{ old('month', $rent->month->format('Y-m')) }}" required>
-                        @error('month')
+                        <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
+                        <input type="text" name="title" id="title" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="{{ old('title', $maintenanceRequest->title) }}" required>
+                        @error('title')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <div class="mb-4">
-                        <label for="amount" class="block text-sm font-medium text-gray-700">Amount</label>
-                        <input type="number" name="amount" id="amount" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="{{ old('amount', $rent->amount) }}" required min="0" step="0.01">
-                        @error('amount')
+                        <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+                        <textarea name="description" id="description" rows="3" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>{{ old('description', $maintenanceRequest->description) }}</textarea>
+                        @error('description')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
                     </div>
@@ -221,9 +220,10 @@
                     <div class="mb-4">
                         <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
                         <select name="status" id="status" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
-                            <option value="Due" {{ old('status', $rent->status) == 'Due' ? 'selected' : '' }}>Due</option>
-                            <option value="Partial" {{ old('status', $rent->status) == 'Partial' ? 'selected' : '' }}>Partial</option>
-                            <option value="Paid" {{ old('status', $rent->status) == 'Paid' ? 'selected' : '' }}>Paid</option>
+                            <option value="Pending" {{ old('status', $maintenanceRequest->status) == 'Pending' ? 'selected' : '' }}>Pending</option>
+                            <option value="In Progress" {{ old('status', $maintenanceRequest->status) == 'In Progress' ? 'selected' : '' }}>In Progress</option>
+                            <option value="Completed" {{ old('status', $maintenanceRequest->status) == 'Completed' ? 'selected' : '' }}>Completed</option>
+                            <option value="Cancelled" {{ old('status', $maintenanceRequest->status) == 'Cancelled' ? 'selected' : '' }}>Cancelled</option>
                         </select>
                         @error('status')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
@@ -231,25 +231,25 @@
                     </div>
 
                     <div class="mb-4">
-                        <label for="due_date" class="block text-sm font-medium text-gray-700">Due Date</label>
-                        <input type="date" name="due_date" id="due_date" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="{{ old('due_date', $rent->due_date->format('Y-m-d')) }}" required>
-                        @error('due_date')
+                        <label for="reported_at" class="block text-sm font-medium text-gray-700">Reported At</label>
+                        <input type="datetime-local" name="reported_at" id="reported_at" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="{{ old('reported_at', $maintenanceRequest->reported_at ? $maintenanceRequest->reported_at->format('Y-m-d\TH:i') : '') }}" required>
+                        @error('reported_at')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <div class="mb-6">
-                        <label for="paid_at" class="block text-sm font-medium text-gray-700">Paid At (Optional)</label>
-                        <input type="datetime-local" name="paid_at" id="paid_at" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="{{ old('paid_at', $rent->paid_at ? $rent->paid_at->format('Y-m-d\TH:i') : '') }}">
-                        @error('paid_at')
+                        <label for="notes" class="block text-sm font-medium text-gray-700">Notes (Optional)</label>
+                        <textarea name="notes" id="notes" rows="3" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">{{ old('notes', $maintenanceRequest->notes) }}</textarea>
+                        @error('notes')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <div class="flex items-center justify-end">
-                        <a href="{{ route('admin.rents.index') }}" class="text-gray-600 hover:text-gray-900 mr-4">Cancel</a>
+                        <a href="{{ route('admin.maintenance-requests.index') }}" class="text-gray-600 hover:text-gray-900 mr-4">Cancel</a>
                         <button type="submit" class="primary-button">
-                            Update Rent Record
+                            Update Request
                         </button>
                     </div>
                 </form>

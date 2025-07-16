@@ -7,7 +7,8 @@ use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\RoomTypeController;
 use App\Http\Controllers\Admin\TenantController;
 use App\Http\Controllers\Admin\RentController;
-use App\Http\Controllers\Admin\PaymentController; // Import PaymentController
+use App\Http\Controllers\Admin\PaymentController;
+use App\Http\Controllers\Admin\MaintenanceRequestController; // Import MaintenanceRequestController
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Auth;
 
@@ -47,14 +48,14 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // Rent Management
     Route::resource('rents', RentController::class);
 
-    // Payment Management - ENSURE THIS LINE IS UNCOMMENTED
+    // Payment Management
     Route::resource('payments', PaymentController::class);
+
+    // Maintenance Request Management - ENSURE THIS LINE IS UNCOMMENTED
+    Route::resource('maintenance-requests', MaintenanceRequestController::class);
 
     // Admin Tenant Management (accessible only by Super Admin via Gate)
     Route::resource('admin-tenants', AdminTenantController::class);
-
-    // Placeholder for other admin resource routes:
-    // Route::resource('maintenance-requests', MaintenanceRequestController::class);
 
     // Admin Profile/Settings (using the existing Breeze ProfileController)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
