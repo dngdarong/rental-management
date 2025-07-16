@@ -3,45 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
-    <!-- Tailwind CSS CDN -->
+    <title>Record New Payment</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Inter Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f4f6f8;
+        body { font-family: 'Inter', sans-serif; background-color: #f4f6f8; }
+        .sidebar { background-color: #1a202c; color: #cbd5e0; }
+        .sidebar a { padding: 0.75rem 1.5rem; display: block; border-radius: 0.5rem; transition: background-color 0.2s ease-in-out; }
+        .sidebar a:hover { background-color: #2d3748; }
+        .sidebar a.active { background-color: #4a5568; color: #ffffff; }
+        .card { background-color: #ffffff; border-radius: 0.75rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+        .navbar { background-color: #ffffff; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); }
+        /* Input and Select styling for consistency */
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        input[type="datetime-local"]:focus,
+        textarea:focus,
+        select:focus {
+            border-color: #4f46e5; /* Indigo-600 */
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5); /* Indigo-500 with transparency */
         }
-        .sidebar {
-            background-color: #1a202c; /* Darker background for sidebar */
-            color: #cbd5e0; /* Light text color */
-        }
-        .sidebar a {
+        .primary-button {
+            background-color: #4f46e5; /* Indigo-600 */
+            color: white;
             padding: 0.75rem 1.5rem;
-            display: block;
-            border-radius: 0.5rem;
-            transition: background-color 0.2s ease-in-out;
-        }
-        .sidebar a:hover {
-            background-color: #2d3748; /* Slightly lighter on hover */
-        }
-        .sidebar a.active {
-            background-color: #4a5568; /* Active link background */
-            color: #ffffff; /* Active link text color */
-        }
-        .card {
-            background-color: #ffffff;
             border-radius: 0.75rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        .navbar {
-            background-color: #ffffff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        .primary-button:hover {
+            background-color: #4338ca; /* Darker indigo on hover */
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
         }
-        /* Dropdown specific styles */
+        /* Dropdown specific styles (copied from dashboard) */
         .dropdown-menu {
             display: none;
             position: absolute;
@@ -52,7 +48,7 @@
             z-index: 1;
             border-radius: 0.5rem;
             overflow: hidden;
-            top: calc(100% + 0.5rem); /* Position below the avatar */
+            top: calc(100% + 0.5rem);
         }
         .dropdown-menu.show {
             display: block;
@@ -147,7 +143,7 @@
     <div class="flex-1 flex flex-col">
         <!-- Top Navbar -->
         <header class="navbar p-4 flex justify-between items-center relative">
-            <h1 class="text-2xl font-semibold text-gray-800">Dashboard</h1>
+            <h1 class="text-2xl font-semibold text-gray-800">Create Payment Record</h1> {{-- Dynamic title --}}
             
             <div class="relative">
                 <button id="profileDropdownToggle" class="flex items-center space-x-2 focus:outline-none">
@@ -172,129 +168,91 @@
 
         <!-- Page Content -->
         <main class="flex-1 p-6 bg-gray-100">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <!-- Total Rooms Card -->
-                <div class="card p-6 flex flex-col items-center justify-center text-center">
-                    <div class="text-4xl font-bold text-indigo-600">{{ $totalRooms }}</div>
-                    <div class="text-lg text-gray-600 mt-2">Total Rooms</div>
-                </div>
+            <div class="card p-6 max-w-2xl mx-auto">
+                <form method="POST" action="{{ route('admin.payments.store') }}">
+                    @csrf
 
-                <!-- Occupied Rooms Card -->
-                <div class="card p-6 flex flex-col items-center justify-center text-center">
-                    <div class="text-4xl font-bold text-red-600">{{ $occupiedRooms }}</div>
-                    <div class="text-lg text-gray-600 mt-2">Occupied Rooms</div>
-                </div>
+                    <div class="mb-4">
+                        <label for="tenant_id" class="block text-sm font-medium text-gray-700">Tenant</label>
+                        <select name="tenant_id" id="tenant_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                            <option value="">Select Tenant</option>
+                            @foreach ($tenants as $tenant)
+                                <option value="{{ $tenant->id }}" {{ old('tenant_id') == $tenant->id ? 'selected' : '' }}>
+                                    {{ $tenant->full_name }} (Room: {{ $tenant->room->room_number ?? 'N/A' }})
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('tenant_id')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                <!-- Available Rooms Card -->
-                <div class="card p-6 flex flex-col items-center justify-center text-center">
-                    <div class="text-4xl font-bold text-green-600">{{ $availableRooms }}</div>
-                    <div class="text-lg text-gray-600 mt-2">Available Rooms</div>
-                </div>
+                    <div class="mb-4">
+                        <label for="rent_id" class="block text-sm font-medium text-gray-700">Associated Rent Record (Optional)</label>
+                        <select name="rent_id" id="rent_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <option value="">No Specific Rent</option>
+                            @foreach ($rents as $rent)
+                                <option value="{{ $rent->id }}" {{ old('rent_id') == $rent->id ? 'selected' : '' }}>
+                                    {{ $rent->tenant->full_name }} - Room {{ $rent->room->room_number ?? 'N/A' }} - {{ $rent->month->format('M Y') }} (${{ number_format($rent->amount, 2) }})
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('rent_id')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                <!-- Total Tenants Card -->
-                <div class="card p-6 flex flex-col items-center justify-center text-center">
-                    <div class="text-4xl font-bold text-purple-600">{{ $totalTenants }}</div>
-                    <div class="text-lg text-gray-600 mt-2">Total Tenants</div>
-                </div>
-            </div>
+                    <div class="mb-4">
+                        <label for="amount" class="block text-sm font-medium text-gray-700">Amount</label>
+                        <input type="number" name="amount" id="amount" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="{{ old('amount') }}" required min="0" step="0.01">
+                        @error('amount')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-            <!-- Monthly Revenue Chart -->
-            <div class="card p-6">
-                <h2 class="text-xl font-semibold text-gray-800 mb-4">Monthly Revenue Last 12 Months</h2>
-                <canvas id="monthlyRevenueChart" class="w-full h-80"></canvas>
+                    <div class="mb-4">
+                        <label for="payment_method" class="block text-sm font-medium text-gray-700">Payment Method</label>
+                        <select name="payment_method" id="payment_method" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                            <option value="">Select Method</option>
+                            @foreach ($paymentMethods as $method)
+                                <option value="{{ $method }}" {{ old('payment_method') == $method ? 'selected' : '' }}>{{ $method }}</option>
+                            @endforeach
+                        </select>
+                        @error('payment_method')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="payment_date" class="block text-sm font-medium text-gray-700">Payment Date & Time</label>
+                        <input type="datetime-local" name="payment_date" id="payment_date" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="{{ old('payment_date', \Carbon\Carbon::now()->format('Y-m-d\TH:i')) }}" required>
+                        @error('payment_date')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="notes" class="block text-sm font-medium text-gray-700">Notes (Optional)</label>
+                        <textarea name="notes" id="notes" rows="3" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">{{ old('notes') }}</textarea>
+                        @error('notes')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="flex items-center justify-end">
+                        <a href="{{ route('admin.payments.index') }}" class="text-gray-600 hover:text-gray-900 mr-4">Cancel</a>
+                        <button type="submit" class="primary-button">
+                            Record Payment
+                        </button>
+                    </div>
+                </form>
             </div>
         </main>
     </div>
 
     <script>
-        // Chart.js initialization
-        document.addEventListener('DOMContentLoaded', function () {
-            const ctx = document.getElementById('monthlyRevenueChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'bar', // You can change this to 'line' for a line chart
-                data: {
-                    labels: JSON.parse('<?php echo json_encode($months ?? []); ?>'),
-                    datasets: [{
-                        label: 'Revenue',
-                        data: JSON.parse('<?php echo json_encode($revenueData ?? []); ?>'),
-                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1,
-                        borderRadius: 8,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top',
-                            labels: {
-                                font: {
-                                    family: 'Inter',
-                                }
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    let label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    if (context.parsed.y !== null) {
-                                        label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed.y);
-                                    }
-                                    return label;
-                                }
-                            },
-                            titleFont: {
-                                family: 'Inter',
-                            },
-                            bodyFont: {
-                                family: 'Inter',
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Amount (USD)',
-                                font: {
-                                    family: 'Inter',
-                                }
-                            },
-                            ticks: {
-                                callback: function(value, index, values) {
-                                    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
-                                },
-                                font: {
-                                    family: 'Inter',
-                                }
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Month',
-                                font: {
-                                    family: 'Inter',
-                                }
-                            },
-                            ticks: {
-                                font: {
-                                    family: 'Inter',
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-
-            // Profile Dropdown Logic
+        // Profile Dropdown Logic (from dashboard)
+        document.addEventListener('DOMContentLoaded', function() {
             const profileDropdownToggle = document.getElementById('profileDropdownToggle');
             const profileDropdownMenu = document.getElementById('profileDropdownMenu');
 

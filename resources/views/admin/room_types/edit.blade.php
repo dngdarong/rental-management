@@ -112,7 +112,7 @@
                         </a>
                     </li>
                     <li class="mb-2">
-                        <a href="#" class="flex items-center space-x-3">
+                        <a href="{{ route('admin.payments.index') }}" class="flex items-center space-x-3 {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 8h6m-5 0h.01M9 12h6m-5 0h.01M9 16h6m-5 0h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             <span>Payments</span>
                         </a>
