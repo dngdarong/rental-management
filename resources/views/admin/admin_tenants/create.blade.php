@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Admin Tenant</title>
+    <title>Create Room Type</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -14,10 +14,10 @@
         .sidebar a.active { background-color: #4a5568; color: #ffffff; }
         .card { background-color: #ffffff; border-radius: 0.75rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
         .navbar { background-color: #ffffff; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); }
-        /* Input styling for consistency */
+        /* Input and Textarea styling for consistency */
         input[type="text"]:focus,
-        input[type="email"]:focus,
-        input[type="password"]:focus {
+        input[type="number"]:focus,
+        textarea:focus {
             border-color: #4f46e5; /* Indigo-600 */
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5); /* Indigo-500 with transparency */
         }
@@ -34,6 +34,37 @@
             background-color: #4338ca; /* Darker indigo on hover */
             box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
         }
+        /* Dropdown specific styles (copied from dashboard) */
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #ffffff;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            top: calc(100% + 0.5rem);
+        }
+        .dropdown-menu.show {
+            display: block;
+        }
+        .dropdown-menu a, .dropdown-menu button {
+            color: #333;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            text-align: left;
+            width: 100%;
+            border: none;
+            background: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .dropdown-menu a:hover, .dropdown-menu button:hover {
+            background-color: #f1f1f1;
+        }
     </style>
 </head>
 <body class="flex min-h-screen">
@@ -45,19 +76,19 @@
             <nav>
                 <ul>
                     <li class="mb-2">
-                        <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-3">
+                        <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-3 {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001 1h3v-3m-3 3h3v-3m-3 0V9m0 3h3"></path></svg>
                             <span>Dashboard</span>
                         </a>
                     </li>
                     <li class="mb-2">
-                        <a href="#" class="flex items-center space-x-3">
+                        <a href="{{ route('admin.rooms.index') }}" class="flex items-center space-x-3 {{ request()->routeIs('admin.rooms.*') ? 'active' : '' }}">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                             <span>Rooms</span>
                         </a>
                     </li>
                     <li class="mb-2">
-                        <a href="#" class="flex items-center space-x-3">
+                        <a href="{{ route('admin.room-types.index') }}" class="flex items-center space-x-3 {{ request()->routeIs('admin.room-types.*') ? 'active' : '' }}">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                             <span>Room Types</span>
                         </a>
@@ -88,7 +119,7 @@
                     </li>
                     @can('manage-admin-tenants')
                     <li class="mb-2">
-                        <a href="{{ route('admin.admin-tenants.index') }}" class="flex items-center space-x-3 active">
+                        <a href="{{ route('admin.admin-tenants.index') }}" class="flex items-center space-x-3 {{ request()->routeIs('admin.admin-tenants.*') ? 'active' : '' }}">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a4 4 0 00-4-4H9a4 4 0 00-4 4v1h10zm-9-9a4 4 0 110 5.292"></path></svg>
                             <span>Manage Admins</span>
                         </a>
@@ -103,26 +134,24 @@
     <div class="flex-1 flex flex-col">
         <!-- Top Navbar -->
         <header class="navbar p-4 flex justify-between items-center relative">
-            <h1 class="text-2xl font-semibold text-gray-800">Manage Admin Tenants</h1>
+            <h1 class="text-2xl font-semibold text-gray-800">Create Room Type</h1> {{-- Dynamic title --}}
             
             <div class="relative">
                 <button id="profileDropdownToggle" class="flex items-center space-x-2 focus:outline-none">
-                    <div class="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center text-white font-semibold text-lg">
-                        {{ Str::substr(Auth::user()->name, 0, 1) }}
-                    </div>
+                    <img src="{{ Auth::user()->profile_image_url }}" alt="Profile Avatar" class="w-10 h-10 rounded-full object-cover">
                     <span class="text-gray-800 font-medium hidden md:block">{{ Auth::user()->name }}</span>
                     <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                 </button>
 
-                <div id="profileDropdownMenu" class="dropdown-menu absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 hidden">
+                <div id="profileDropdownMenu" class="dropdown-menu">
                     <div class="px-4 py-2 text-sm text-gray-700 border-b border-gray-200">
                         <div class="font-medium">{{ Auth::user()->name }}</div>
                         <div class="text-gray-500">{{ Auth::user()->email }}</div>
                     </div>
-                    <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+                    <a href="{{ route('profile.edit') }}">Settings</a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Logout</button>
+                        <button type="submit">Logout</button>
                     </form>
                 </div>
             </div>
@@ -131,7 +160,7 @@
         <!-- Page Content -->
         <main class="flex-1 p-6 bg-gray-100">
             <div class="card p-6 max-w-2xl mx-auto">
-                <form method="POST" action="{{ route('admin.admin-tenants.store') }}">
+                <form method="POST" action="{{ route('admin.room-types.store') }}">
                     @csrf
 
                     <div class="mb-4">
@@ -143,30 +172,25 @@
                     </div>
 
                     <div class="mb-4">
-                        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                        <input type="email" name="email" id="email" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="{{ old('email') }}" required>
-                        @error('email')
-                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                        <input type="password" name="password" id="password" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required autocomplete="new-password">
-                        @error('password')
+                        <label for="description" class="block text-sm font-medium text-gray-700">Description (Optional)</label>
+                        <textarea name="description" id="description" rows="3" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">{{ old('description') }}</textarea>
+                        @error('description')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <div class="mb-6">
-                        <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Confirm Password</label>
-                        <input type="password" name="password_confirmation" id="password_confirmation" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required autocomplete="new-password">
+                        <label for="default_price" class="block text-sm font-medium text-gray-700">Default Price</label>
+                        <input type="number" name="default_price" id="default_price" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="{{ old('default_price') }}" required min="0" step="0.01">
+                        @error('default_price')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div class="flex items-center justify-end">
-                        <a href="{{ route('admin.admin-tenants.index') }}" class="text-gray-600 hover:text-gray-900 mr-4">Cancel</a>
+                        <a href="{{ route('admin.room-types.index') }}" class="text-gray-600 hover:text-gray-900 mr-4">Cancel</a>
                         <button type="submit" class="primary-button">
-                            Create Admin Tenant
+                            Create Room Type
                         </button>
                     </div>
                 </form>
@@ -181,15 +205,14 @@
             const profileDropdownMenu = document.getElementById('profileDropdownMenu');
 
             if (profileDropdownToggle && profileDropdownMenu) {
-                profileDropdownToggle.addEventListener('click', function(event) {
-                    event.stopPropagation();
-                    profileDropdownMenu.classList.toggle('hidden');
+                profileDropdownToggle.addEventListener('click', function() {
+                    profileDropdownMenu.classList.toggle('show');
                 });
 
                 window.addEventListener('click', function(event) {
                     if (!profileDropdownToggle.contains(event.target) && !profileDropdownMenu.contains(event.target)) {
-                        if (!profileDropdownMenu.classList.contains('hidden')) {
-                            profileDropdownMenu.classList.add('hidden');
+                        if (profileDropdownMenu.classList.contains('show')) {
+                            profileDropdownMenu.classList.remove('show');
                         }
                     }
                 });

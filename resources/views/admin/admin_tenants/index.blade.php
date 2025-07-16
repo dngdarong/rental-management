@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Admin Tenants</title>
+    <title>Manage Room Types</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -44,6 +44,37 @@
         .pagination-links nav span.text-gray-500 {
             opacity: 0.6;
             cursor: not-allowed;
+        }
+
+        /* Dropdown menu styles */
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: #fff;
+            min-width: 180px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-radius: 0.5rem;
+            z-index: 50;
+        }
+        .dropdown-menu.show {
+            display: block;
+        }
+        .dropdown-menu a, .dropdown-menu button {
+            display: block;
+            width: 100%;
+            padding: 0.75rem 1.5rem;
+            text-align: left;
+            color: #4a5568;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.2s;
+        }
+        .dropdown-menu a:hover, .dropdown-menu button:hover {
+            background: #f3f4f6;
         }
 
         /* Custom Modal Styles (copied from login page for consistency) */
@@ -121,19 +152,19 @@
             <nav>
                 <ul>
                     <li class="mb-2">
-                        <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-3">
+                        <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-3 {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001 1h3v-3m-3 3h3v-3m-3 0V9m0 3h3"></path></svg>
                             <span>Dashboard</span>
                         </a>
                     </li>
                     <li class="mb-2">
-                        <a href="#" class="flex items-center space-x-3">
+                        <a href="{{ route('admin.rooms.index') }}" class="flex items-center space-x-3 {{ request()->routeIs('admin.rooms.*') ? 'active' : '' }}">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                             <span>Rooms</span>
                         </a>
                     </li>
                     <li class="mb-2">
-                        <a href="{{ route('admin.room-types.index') }}" class="flex items-center space-x-3">
+                        <a href="{{ route('admin.room-types.index') }}" class="flex items-center space-x-3 {{ request()->routeIs('admin.room-types.*') ? 'active' : '' }}">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                             <span>Room Types</span>
                         </a>
@@ -162,9 +193,9 @@
                             <span>Maintenance</span>
                         </a>
                     </li>
-                    @can('manage-admin-tenants') {{-- Only show this link to Super Admins --}}
+                    @can('manage-admin-tenants')
                     <li class="mb-2">
-                        <a href="{{ route('admin.admin-tenants.index') }}" class="flex items-center space-x-3 active">
+                        <a href="{{ route('admin.admin-tenants.index') }}" class="flex items-center space-x-3 {{ request()->routeIs('admin.admin-tenants.*') ? 'active' : '' }}">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a4 4 0 00-4-4H9a4 4 0 00-4 4v1h10zm-9-9a4 4 0 110 5.292"></path></svg>
                             <span>Manage Admins</span>
                         </a>
@@ -179,26 +210,24 @@
     <div class="flex-1 flex flex-col">
         <!-- Top Navbar -->
         <header class="navbar p-4 flex justify-between items-center relative">
-            <h1 class="text-2xl font-semibold text-gray-800">Manage Admin Tenants</h1>
+            <h1 class="text-2xl font-semibold text-gray-800">Manage Room Types</h1> {{-- Dynamic title --}}
             
             <div class="relative">
                 <button id="profileDropdownToggle" class="flex items-center space-x-2 focus:outline-none">
-                    <div class="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center text-white font-semibold text-lg">
-                        {{ Str::substr(Auth::user()->name, 0, 1) }}
-                    </div>
+                    <img src="{{ Auth::user()->profile_image_url }}" alt="Profile Avatar" class="w-10 h-10 rounded-full object-cover">
                     <span class="text-gray-800 font-medium hidden md:block">{{ Auth::user()->name }}</span>
                     <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                 </button>
 
-                <div id="profileDropdownMenu" class="dropdown-menu absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 hidden">
+                <div id="profileDropdownMenu" class="dropdown-menu">
                     <div class="px-4 py-2 text-sm text-gray-700 border-b border-gray-200">
                         <div class="font-medium">{{ Auth::user()->name }}</div>
                         <div class="text-gray-500">{{ Auth::user()->email }}</div>
                     </div>
-                    <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+                    <a href="{{ route('profile.edit') }}">Settings</a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Logout</button>
+                        <button type="submit">Logout</button>
                     </form>
                 </div>
             </div>
@@ -207,8 +236,8 @@
         <!-- Page Content -->
         <main class="flex-1 p-6 bg-gray-100">
             <div class="flex justify-end mb-6">
-                <a href="{{ route('admin.admin-tenants.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                    Add New Admin Tenant
+                <a href="{{ route('admin.room-types.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                    Add New Room Type
                 </a>
             </div>
 
@@ -218,21 +247,21 @@
                         <thead class="table-header">
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-lg">Name</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Default Price</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            @forelse ($adminTenants as $adminTenant)
+                            @forelse ($roomTypes as $roomType)
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $adminTenant->name }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $adminTenant->email }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ Str::replace('_', ' ', Str::title($adminTenant->role)) }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $roomType->name }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $roomType->description ?? 'N/A' }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${{ number_format($roomType->default_price, 2) }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <a href="{{ route('admin.admin-tenants.edit', $adminTenant) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
-                                        <button type="button" onclick="confirmDelete('{{ $adminTenant->id }}')" class="text-red-600 hover:text-red-900">Delete</button>
-                                        <form id="delete-form-{{ $adminTenant->id }}" action="{{ route('admin.admin-tenants.destroy', $adminTenant) }}" method="POST" style="display: none;">
+                                        <a href="{{ route('admin.room-types.edit', $roomType) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
+                                        <button type="button" onclick="confirmDelete('{{ $roomType->id }}')" class="text-red-600 hover:text-red-900">Delete</button>
+                                        <form id="delete-form-{{ $roomType->id }}" action="{{ route('admin.room-types.destroy', $roomType) }}" method="POST" style="display: none;">
                                             @csrf
                                             @method('DELETE')
                                         </form>
@@ -240,14 +269,14 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No admin tenants found.</td>
+                                    <td colspan="4" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No room types found.</td>
                                 </tr>
                             @endforelse
                         </tbody>
                     </table>
                 </div>
                 <div class="mt-4 pagination-links">
-                    {{ $adminTenants->links() }}
+                    {{ $roomTypes->links() }}
                 </div>
             </div>
         </main>
@@ -268,7 +297,7 @@
     <div id="confirmDeleteModal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">Confirm Deletion</div>
-            <div class="modal-body">Are you sure you want to delete this admin tenant? This action cannot be undone.</div>
+            <div class="modal-body">Are you sure you want to delete this room type? This action cannot be undone.</div>
             <div class="modal-footer flex justify-center">
                 <button id="cancelDelete" class="cancel-btn">Cancel</button>
                 <button id="confirmDelete" class="primary-button">Delete</button>
@@ -277,7 +306,7 @@
     </div>
 
     <script>
-        // Custom Alert Modal Logic (from login page)
+        // Custom Alert Modal Logic
         document.addEventListener('DOMContentLoaded', function() {
             const modal = document.getElementById('customAlertModal');
             const modalTitle = document.getElementById('modalTitle');
@@ -315,19 +344,20 @@
                 showAlert('Error!', sessionError);
             }
 
-            // Profile Dropdown Logic (from dashboard)
+            // Profile Dropdown Logic
             const profileDropdownToggle = document.getElementById('profileDropdownToggle');
             const profileDropdownMenu = document.getElementById('profileDropdownMenu');
 
             if (profileDropdownToggle && profileDropdownMenu) {
-                profileDropdownToggle.addEventListener('click', function(event) {
-                    event.stopPropagation();
-                    profileDropdownMenu.classList.toggle('hidden');
+                profileDropdownToggle.addEventListener('click', function() {
+                    profileDropdownMenu.classList.toggle('show');
                 });
 
                 window.addEventListener('click', function(event) {
                     if (!profileDropdownToggle.contains(event.target) && !profileDropdownMenu.contains(event.target)) {
-                        profileDropdownMenu.classList.add('hidden');
+                        if (profileDropdownMenu.classList.contains('show')) {
+                            profileDropdownMenu.classList.remove('show');
+                        }
                     }
                 });
             }
@@ -338,8 +368,8 @@
             const confirmDeleteBtn = document.getElementById('confirmDelete');
             let formToSubmit = null; // To store the form reference
 
-            window.confirmDelete = function(adminTenantId) {
-                formToSubmit = document.getElementById('delete-form-' + adminTenantId);
+            window.confirmDelete = function(roomTypeId) { // Changed parameter name to roomTypeId
+                formToSubmit = document.getElementById('delete-form-' + roomTypeId);
                 confirmDeleteModal.classList.add('show');
             }
 
