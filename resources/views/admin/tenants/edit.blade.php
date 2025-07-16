@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Admin Tenant</title>
+    <title>Edit Tenant</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -14,10 +14,13 @@
         .sidebar a.active { background-color: #4a5568; color: #ffffff; }
         .card { background-color: #ffffff; border-radius: 0.75rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
         .navbar { background-color: #ffffff; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); }
-        /* Input styling for consistency */
+        /* Input and Select styling for consistency */
         input[type="text"]:focus,
         input[type="email"]:focus,
-        input[type="password"]:focus {
+        input[type="tel"]:focus,
+        input[type="date"]:focus,
+        textarea:focus,
+        select:focus {
             border-color: #4f46e5; /* Indigo-600 */
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5); /* Indigo-500 with transparency */
         }
@@ -82,6 +85,12 @@
                         </a>
                     </li>
                     <li class="mb-2">
+                        <a href="{{ route('admin.admin-tenants.index') }}" class="flex items-center space-x-3 {{ request()->routeIs('admin.admin-tenants.*') ? 'active' : '' }}">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a4 4 0 00-4-4H9a4 4 0 00-4 4v1h10zm-9-9a4 4 0 110 5.292"></path></svg>
+                            <span>Add Admins</span> 
+                        </a>
+                    </li>
+                    <li class="mb-2">
                         <a href="{{ route('admin.rooms.index') }}" class="flex items-center space-x-3 {{ request()->routeIs('admin.rooms.*') ? 'active' : '' }}">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                             <span>Rooms</span>
@@ -134,7 +143,7 @@
     <div class="flex-1 flex flex-col">
         <!-- Top Navbar -->
         <header class="navbar p-4 flex justify-between items-center relative">
-            <h1 class="text-2xl font-semibold text-gray-800">Edit Admin Tenant</h1> {{-- Dynamic title --}}
+            <h1 class="text-2xl font-semibold text-gray-800">Edit Tenant</h1> {{-- Dynamic title --}}
             
             <div class="relative">
                 <button id="profileDropdownToggle" class="flex items-center space-x-2 focus:outline-none">
@@ -160,44 +169,82 @@
         <!-- Page Content -->
         <main class="flex-1 p-6 bg-gray-100">
             <div class="card p-6 max-w-2xl mx-auto">
-                <form method="POST" action="{{ route('admin.admin-tenants.update', $adminTenant) }}"> {{-- Corrected action to admin.admin-tenants.update --}}
+                <form method="POST" action="{{ route('admin.tenants.update', $tenant) }}">
                     @csrf
                     @method('PUT')
 
                     <div class="mb-4">
-                        <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
-                        <input type="text" name="name" id="name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="{{ old('name', $adminTenant->name) }}" required autofocus>
-                        @error('name')
+                        <label for="full_name" class="block text-sm font-medium text-gray-700">Full Name</label>
+                        <input type="text" name="full_name" id="full_name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="{{ old('full_name', $tenant->full_name) }}" required autofocus>
+                        @error('full_name')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <div class="mb-4">
-                        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                        <input type="email" name="email" id="email" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="{{ old('email', $adminTenant->email) }}" required>
+                        <label for="email" class="block text-sm font-medium text-gray-700">Email (Optional)</label>
+                        <input type="email" name="email" id="email" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="{{ old('email', $tenant->email) }}">
                         @error('email')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <div class="mb-4">
-                        <label for="password" class="block text-sm font-medium text-gray-700">New Password (optional)</label>
-                        <input type="password" name="password" id="password" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" autocomplete="new-password">
-                        <p class="text-xs text-gray-500 mt-1">Leave blank to keep current password.</p>
-                        @error('password')
+                        <label for="phone" class="block text-sm font-medium text-gray-700">Phone</label>
+                        <input type="tel" name="phone" id="phone" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="{{ old('phone', $tenant->phone) }}" required>
+                        @error('phone')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="address" class="block text-sm font-medium text-gray-700">Address (Optional)</label>
+                        <textarea name="address" id="address" rows="3" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">{{ old('address', $tenant->address) }}</textarea>
+                        @error('address')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="gender" class="block text-sm font-medium text-gray-700">Gender (Optional)</label>
+                        <select name="gender" id="gender" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <option value="">Select Gender</option>
+                            <option value="Male" {{ old('gender', $tenant->gender) == 'Male' ? 'selected' : '' }}>Male</option>
+                            <option value="Female" {{ old('gender', $tenant->gender) == 'Female' ? 'selected' : '' }}>Female</option>
+                            <option value="Other" {{ old('gender', $tenant->gender) == 'Other' ? 'selected' : '' }}>Other</option>
+                        </select>
+                        @error('gender')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="room_id" class="block text-sm font-medium text-gray-700">Assign Room (Optional)</label>
+                        <select name="room_id" id="room_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <option value="">No Room Assigned</option>
+                            @foreach ($availableRooms as $room)
+                                <option value="{{ $room->id }}" {{ old('room_id', $tenant->room_id) == $room->id ? 'selected' : '' }}>
+                                    {{ $room->room_number }} ({{ Str::title(Str::replace('_', ' ', $room->status)) }}) - ${{ number_format($room->price, 2) }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('room_id')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <div class="mb-6">
-                        <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Confirm New Password</label>
-                        <input type="password" name="password_confirmation" id="password_confirmation" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" autocomplete="new-password">
+                        <label for="start_date" class="block text-sm font-medium text-gray-700">Start Date</label>
+                        <input type="date" name="start_date" id="start_date" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="{{ old('start_date', $tenant->start_date->format('Y-m-d')) }}" required>
+                        @error('start_date')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div class="flex items-center justify-end">
-                        <a href="{{ route('admin.admin-tenants.index') }}" class="text-gray-600 hover:text-gray-900 mr-4">Cancel</a>
+                        <a href="{{ route('admin.tenants.index') }}" class="text-gray-600 hover:text-gray-900 mr-4">Cancel</a>
                         <button type="submit" class="primary-button">
-                            Update Admin Tenant
+                            Update Tenant
                         </button>
                     </div>
                 </form>

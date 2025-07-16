@@ -41,7 +41,7 @@ class TenantController extends Controller
             'phone' => ['required', 'string', 'max:20', 'unique:tenants,phone'],
             'address' => ['nullable', 'string', 'max:500'],
             'gender' => ['nullable', 'in:Male,Female,Other'],
-            'room_id' => ['nullable', 'exists:rooms,id', Rule::unique('tenants')->ignore($request->tenant_id, 'id')], // Ensure room is not already assigned to another tenant
+            'room_id' => ['nullable', 'exists:rooms,id', Rule::unique('tenants')->ignore($request->tenant_id, 'id')],
             'start_date' => ['required', 'date'],
         ]);
 

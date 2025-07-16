@@ -194,7 +194,7 @@
                     </div>
 
                     <div class="flex items-center justify-end">
-                        <a href="{{ route('admin.room-types.index') }}" class="text-gray-600 hover:text-gray-900 mr-4">Cancel</a>
+                        <a href="{{ route('admin.admin-tenants.index') }}" class="text-gray-600 hover:text-gray-900 mr-4">Cancel</a>
                         <button type="submit" class="primary-button">
                             Create Room Type
                         </button>
