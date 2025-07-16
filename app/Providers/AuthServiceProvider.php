@@ -3,8 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Gate; // Import Gate facade
-use App\Models\User; // Import User model
+use Illuminate\Support\Facades\Gate;
+use App\Models\User;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -22,14 +22,10 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Define a gate for 'manage-admin-tenants'
-        // Only Super Admins can manage Admin Tenants
         Gate::define('manage-admin-tenants', function (User $user) {
             return $user->isSuperAdmin();
         });
 
-        // Define a gate for 'access-admin-panel'
-        // Both Super Admins and Admin Tenants can access the admin panel
         Gate::define('access-admin-panel', function (User $user) {
             return $user->isSuperAdmin() || $user->isAdminTenant();
         });

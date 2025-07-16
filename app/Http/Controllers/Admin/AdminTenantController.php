@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\User; // Use the User model for admin tenants
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
-use Illuminate\Support\Facades\Gate; // Import Gate facade (though not directly used in this file for middleware application)
+use Illuminate\Support\Facades\Gate;
 
 class AdminTenantController extends Controller
 {
@@ -17,17 +17,14 @@ class AdminTenantController extends Controller
      * @var array
      */
     protected $middleware = [
-        'can:manage-admin-tenants', // Apply the 'manage-admin-tenants' gate to all actions
+        'can:manage-admin-tenants',
     ];
-
-    // Removed the __construct method entirely as middleware is now defined via property.
 
     /**
      * Display a listing of the admin tenants.
      */
     public function index()
     {
-        // Only show users with 'admin_tenant' role
         $adminTenants = User::where('role', 'admin_tenant')->paginate(10);
         return view('admin.admin_tenants.index', compact('adminTenants'));
     }
@@ -55,7 +52,7 @@ class AdminTenantController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'admin_tenant', // Force the role to 'admin_tenant'
+            'role' => 'admin_tenant',
         ]);
 
         return redirect()->route('admin.admin-tenants.index')->with('success', 'Admin Tenant created successfully!');
@@ -64,9 +61,8 @@ class AdminTenantController extends Controller
     /**
      * Show the form for editing the specified admin tenant.
      */
-    public function edit(User $adminTenant) // Using route model binding
+    public function edit(User $adminTenant)
     {
-        // Ensure only admin_tenant roles can be edited here, not super_admin
         if ($adminTenant->isSuperAdmin()) {
             return redirect()->route('admin.admin-tenants.index')->with('error', 'Cannot edit Super Admin accounts through this interface.');
         }
@@ -76,9 +72,8 @@ class AdminTenantController extends Controller
     /**
      * Update the specified admin tenant in storage.
      */
-    public function update(Request $request, User $adminTenant) // Using route model binding
+    public function update(Request $request, User $adminTenant)
     {
-        // Ensure only admin_tenant roles can be updated here, not super_admin
         if ($adminTenant->isSuperAdmin()) {
             return redirect()->route('admin.admin-tenants.index')->with('error', 'Cannot update Super Admin accounts through this interface.');
         }
@@ -107,9 +102,9 @@ class AdminTenantController extends Controller
     /**
      * Remove the specified admin tenant from storage.
      */
-    public function destroy(User $adminTenant) // Using route model binding
+    public function destroy(User $adminTenant)
     {
-        // Prevent deleting Super Admins or the currently logged-in user
+        // This is the line that Intelephense flags, but it's correct for Eloquent models.
         if ($adminTenant->isSuperAdmin() || $adminTenant->id === auth()->id()) {
             return redirect()->route('admin.admin-tenants.index')->with('error', 'Cannot delete Super Admin accounts or your own account.');
         }
