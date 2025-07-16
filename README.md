@@ -60,74 +60,74 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
-Rental Management System - Admin Panel
+## Rental Management System - Admin Panel
 This project is a comprehensive Rental Management System (Admin Panel) built using the Laravel framework. It provides administrators with a robust and intuitive interface to manage various aspects of a rental business, focusing specifically on the backend operations without a tenant-facing portal.
 
-Project Overview
+## Project Overview
 The primary goal of this system is to streamline the administrative tasks associated with property rentals, offering a centralized platform for managing rooms, room types, tenants, rent records, payments, and maintenance requests. It is designed for single or multiple administrators (with role-based access for Super Admins) to efficiently oversee rental operations.
 
-Key Features
+## Key Features
 The system is built around a CRUD (Create, Read, Update, Delete) paradigm for core entities and includes the following functionalities:
 
-Dashboard:
+## Dashboard:
 
-Provides an at-a-glance overview of key metrics: Total Rooms, Occupied Rooms, Available Rooms, and Total Tenants.
+- Provides an at-a-glance overview of key metrics: Total Rooms, Occupied Rooms, Available Rooms, and Total Tenants.
 
-Features a dynamic Monthly Revenue Chart (powered by Chart.js) displaying financial performance over the last 12 months.
+- Features a dynamic Monthly Revenue Chart (powered by Chart.js) displaying financial performance over the last 12 months.
 
-Room Management:
+## Room Management:
 
-Add/Edit/Delete Rooms: Full CRUD capabilities for individual rooms.
+- Add/Edit/Delete Rooms: Full CRUD capabilities for individual rooms.
 
-Room Details: Manages room_number, room_type, status (available, occupied, under maintenance), and price.
+- Room Details: Manages room_number, room_type, status (available, occupied, under maintenance), and price.
 
-Room Type Assignment: Allows assigning rooms to predefined room types.
+- Room Type Assignment: Allows assigning rooms to predefined room types.
 
-Room Type Management:
+## Room Type Management:
 
-Create/Edit/Delete Room Types: Manages categories of rooms (e.g., Single, Double, AC, Non-AC).
+- Create/Edit/Delete Room Types: Manages categories of rooms (e.g., Single, Double, AC, Non-AC).
 
-Default Pricing: Assigns a default_price to each room type, which can be overridden at the individual room level.
+- Default Pricing: Assigns a default_price to each room type, which can be overridden at the individual room level.
 
-Tenant Management:
+## Tenant Management:
 
-Register/Edit Tenants: Comprehensive management of tenant information including full_name, email, phone, address, gender, and start_date.
+- Register/Edit Tenants: Comprehensive management of tenant information including full_name, email, phone, address, gender, and start_date.
 
-Room Assignment: Facilitates assigning tenants to available rooms, automatically updating room status.
+- Room Assignment: Facilitates assigning tenants to available rooms, automatically updating room status.
 
-Rent Management:
+## Rent Management:
 
-Record Rent: Allows administrators to manually record monthly rent charges for tenants.
+- Record Rent: Allows administrators to manually record monthly rent charges for tenants.
 
-Track Payment Status: Monitors rent status (Paid, Due, Partial).
+- Track Payment Status: Monitors rent status (Paid, Due, Partial).
 
-Invoice Generation (Conceptual): Designed to support future invoice generation based on rent records.
+- Invoice Generation (Conceptual): Designed to support future invoice generation based on rent records.
 
-Payment Management:
+## Payment Management:
 
-Record Payments: Logs individual payment transactions.
+- Record Payments: Logs individual payment transactions.
 
-View Payment History: Provides a detailed history of payments by tenant, with filtering options by month and payment method.
+- View Payment History: Provides a detailed history of payments by tenant, with filtering options by month and payment method.
 
-Rent Status Update: Payments automatically update the status of associated rent records (e.g., from 'Due' to 'Partial' or 'Paid').
+- Rent Status Update: Payments automatically update the status of associated rent records (e.g., from 'Due' to 'Partial' or 'Paid').
 
-Maintenance Request Management:
+## Maintenance Request Management:
 
-View/Update Requests: Allows administrators to view all maintenance requests and update their status (Pending, In Progress, Completed, Cancelled).
+- View/Update Requests: Allows administrators to view all maintenance requests and update their status (Pending, In Progress, Completed, Cancelled).
 
-Admin Notes: Ability to add internal notes to requests.
+- Admin Notes: Ability to add internal notes to requests.
 
-Admin User Management (SuperAdmin only):
+## Admin User Management (SuperAdmin only):
 
-Role-Based Access: Implements a super_admin role with exclusive access to manage other admin_tenant accounts.
+- Role-Based Access: Implements a super_admin role with exclusive access to manage other admin_tenant accounts.
 
-Create/Edit/Delete Admin Tenants: Super Admins can create new admin users, update their details, and delete them (with safeguards to prevent self-deletion or super admin deletion).
+- Create/Edit/Delete Admin Tenants: Super Admins can create new admin users, update their details, and delete them (with safeguards to prevent self-deletion or super admin deletion).
 
-Admin Profile & Settings:
+## Admin Profile & Settings:
 
-Allows the logged-in administrator to update their personal details (name, email) and change their password.
+- Allows the logged-in administrator to update their personal details (name, email) and change their password.
 
-Profile Image Upload: Supports uploading and managing a profile image for the admin user, with a Gravatar fallback.
+- Profile Image Upload: Supports uploading and managing a profile image for the admin user, with a Gravatar fallback.
 
 Technologies Used
 Framework: Laravel 10+
