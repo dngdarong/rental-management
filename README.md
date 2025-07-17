@@ -156,15 +156,15 @@ Ensure you have the following software installed on your system:
 
 * PHP (8.2 or higher): Laravel 10+ requires PHP 8.2 or newer.
 
-* Composer: PHP dependency manager. [Download Composer](...)
+* Composer: PHP dependency manager. [Download Composer](https://getcomposer.org/Composer-Setup.exe)
 
-* Node.js & npm: For frontend asset compilation. [Download Node.js (includes npm)](...)
+* Node.js & npm: For frontend asset compilation. [Download Node.js (includes npm)](https://nodejs.org/en/download)
 
 * MySQL Database Server: Or another compatible database (e.g., MariaDB).
 
 * Web Server (e.g., Apache, Nginx): Or use Laravel's built-in development server. If using XAMPP/WAMP/Laragon, these are usually included.
 
-* Git: For cloning the repository. [Download Git](...)
+* Git: For cloning the repository. [Download Git](https://git-scm.com/downloads)
 
 * PowerShell Execution Policy (Windows only): If you encounter errors running `npm` or `php artisan` commands, you might need to adjust PowerShell's execution policy. Open PowerShell as Administrator and run:
 
