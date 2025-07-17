@@ -206,12 +206,12 @@
         </main>
     </div>
 
-    <script>
+<script>
         // Chart.js initialization
         document.addEventListener('DOMContentLoaded', function () {
             const ctx = document.getElementById('monthlyRevenueChart').getContext('2d');
             new Chart(ctx, {
-                type: 'bar', // You can change this to 'line' for a line chart
+                type: 'bar', 
                 data: {
                     labels: JSON.parse('<?php echo json_encode($months ?? []); ?>'),
                     datasets: [{
