@@ -69,13 +69,13 @@ The primary goal of this system is to streamline the administrative tasks associ
 ## Key Features
 The system is built around a CRUD (Create, Read, Update, Delete) paradigm for core entities and includes the following functionalities:
 
-  # Dashboard:
+- Dashboard:
 
 * Provides an at-a-glance overview of key metrics: Total Rooms, Occupied Rooms, Available Rooms, and Total Tenants.
 
 * Features a dynamic Monthly Revenue Chart (powered by Chart.js) displaying financial performance over the last 12 months.
 
-  # Room Management:
+- Room Management:
 
 * Add/Edit/Delete Rooms: Full CRUD capabilities for individual rooms.
 
