@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Room Type</title>
+    <title>Create Admin Tenant</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -14,10 +14,10 @@
         .sidebar a.active { background-color: #4a5568; color: #ffffff; }
         .card { background-color: #ffffff; border-radius: 0.75rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
         .navbar { background-color: #ffffff; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); }
-        /* Input and Textarea styling for consistency */
+        /* Input styling for consistency */
         input[type="text"]:focus,
-        input[type="number"]:focus,
-        textarea:focus {
+        input[type="email"]:focus,
+        input[type="password"]:focus {
             border-color: #4f46e5; /* Indigo-600 */
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5); /* Indigo-500 with transparency */
         }
@@ -140,7 +140,7 @@
     <div class="flex-1 flex flex-col">
         <!-- Top Navbar -->
         <header class="navbar p-4 flex justify-between items-center relative">
-            <h1 class="text-2xl font-semibold text-gray-800">Create Room Type</h1> {{-- Dynamic title --}}
+            <h1 class="text-2xl font-semibold text-gray-800">Create Admin Tenant</h1>
             
             <div class="relative">
                 <button id="profileDropdownToggle" class="flex items-center space-x-2 focus:outline-none">
@@ -166,7 +166,7 @@
         <!-- Page Content -->
         <main class="flex-1 p-6 bg-gray-100">
             <div class="card p-6 max-w-2xl mx-auto">
-                <form method="POST" action="{{ route('admin.room-types.store') }}">
+                <form method="POST" action="{{ route('admin.admin-tenants.store') }}">
                     @csrf
 
                     <div class="mb-4">
@@ -178,25 +178,37 @@
                     </div>
 
                     <div class="mb-4">
-                        <label for="description" class="block text-sm font-medium text-gray-700">Description (Optional)</label>
-                        <textarea name="description" id="description" rows="3" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">{{ old('description') }}</textarea>
-                        @error('description')
+                        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                        <input type="email" name="email" id="email" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="{{ old('email') }}" required>
+                        @error('email')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                        <input type="password" name="password" id="password" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required autocomplete="new-password">
+                        @error('password')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <div class="mb-6">
-                        <label for="default_price" class="block text-sm font-medium text-gray-700">Default Price</label>
-                        <input type="number" name="default_price" id="default_price" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="{{ old('default_price') }}" required min="0" step="0.01">
-                        @error('default_price')
-                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                        @enderror
+                        <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+                        <input type="password" name="password_confirmation" id="password_confirmation" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required autocomplete="new-password">
+                    </div>
+
+                    {{-- Display-only Role field --}}
+                    <div class="mb-6">
+                        <label for="role" class="block text-sm font-medium text-gray-700">Role</label>
+                        <input type="text" name="role" id="role" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 cursor-not-allowed sm:text-sm" value="Admin Tenant" readonly>
+                        <p class="text-xs text-gray-500 mt-1">New admin accounts are automatically assigned the 'Admin Tenant' role.</p>
                     </div>
 
                     <div class="flex items-center justify-end">
                         <a href="{{ route('admin.admin-tenants.index') }}" class="text-gray-600 hover:text-gray-900 mr-4">Cancel</a>
                         <button type="submit" class="primary-button">
-                            Create Room Type
+                            Create Admin Tenant
                         </button>
                     </div>
                 </form>
