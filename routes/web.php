@@ -48,6 +48,9 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // Rent Management
     Route::resource('rents', RentController::class);
 
+    // Generate Invoice for Rent (PDF)
+    Route::get('rents/{rent}/invoice/pdf', [RentController::class, 'generatePdf'])->name('rents.invoice.pdf');
+
     // Payment Management
     Route::resource('payments', PaymentController::class);
 

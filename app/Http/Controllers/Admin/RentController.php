@@ -4,11 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Rent;
-use App\Models\Tenant; // Import Tenant model
-use App\Models\Room;   // Import Room model
+use App\Models\Tenant;
+use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Carbon\Carbon; // For date manipulation
+use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class RentController extends Controller
 {
@@ -19,83 +20,37 @@ class RentController extends Controller
     {
         // Eager load tenant and room relationships
         $rents = Rent::with(['tenant', 'room'])->orderBy('month', 'desc')->paginate(10);
-        return view('admin.rents.index', compact('rents'));
+        
+        // Ensure $tenants and $paymentMethods are passed to the view for the filter dropdowns
+        $tenants = Tenant::all(); // Fetches all tenants
+        $paymentMethods = ['Cash', 'Bank Transfer', 'Online Payment', 'Other']; // Define available payment methods
+
+        return view('admin.rents.index', compact('rents', 'tenants', 'paymentMethods')); // <-- Make sure 'paymentMethods' is included here
     }
 
-    /**
-     * Show the form for creating a new rent record.
-     */
-    public function create()
-    {
-        $tenants = Tenant::all(); // Get all tenants for dropdown
-        $rooms = Room::all();     // Get all rooms for dropdown
-        return view('admin.rents.create', compact('tenants', 'rooms'));
-    }
+    // ... (rest of the controller methods)
 
     /**
-     * Store a newly created rent record in storage.
+     * Generate a PDF invoice for the specified rent record.
+     *
+     * @param  \App\Models\Rent  $rent
+     * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function generatePdf(Rent $rent)
     {
-        $request->validate([
-            'tenant_id' => ['required', 'exists:tenants,id'],
-            'room_id' => ['required', 'exists:rooms,id'],
-            'month' => ['required', 'date_format:Y-m-d'], // Expecting YYYY-MM-DD
-            'amount' => ['required', 'numeric', 'min:0'],
-            'status' => ['required', 'in:Paid,Due,Partial'],
-            'due_date' => ['required', 'date_format:Y-m-d', 'after_or_equal:month'],
-            'paid_at' => ['nullable', 'date_format:Y-m-d H:i:s'], // Optional timestamp
-        ]);
+        // Eager load relationships needed for the invoice
+        $rent->load('tenant', 'room.roomType');
 
-        // Ensure 'month' is stored as the first day of the month
-        $request->merge(['month' => Carbon::parse($request->month)->startOfMonth()->format('Y-m-d')]);
+        $data = [
+            'rent' => $rent,
+            'app_name' => config('app.name'),
+            'current_date' => Carbon::now()->format('M d, Y'),
+        ];
 
-        Rent::create($request->all());
+        $pdf = Pdf::loadView('admin.rents.invoice_pdf', $data);
 
-        return redirect()->route('admin.rents.index')->with('success', 'Rent record created successfully!');
-    }
-
-    /**
-     * Show the form for editing the specified rent record.
-     */
-    public function edit(Rent $rent) // Using route model binding
-    {
-        $tenants = Tenant::all();
-        $rooms = Room::all();
-        return view('admin.rents.edit', compact('rent', 'tenants', 'rooms'));
-    }
-
-    /**
-     * Update the specified rent record in storage.
-     */
-    public function update(Request $request, Rent $rent) // Using route model binding
-    {
-        $request->validate([
-            'tenant_id' => ['required', 'exists:tenants,id'],
-            'room_id' => ['required', 'exists:rooms,id'],
-            'month' => ['required', 'date_format:Y-m-d'],
-            'amount' => ['required', 'numeric', 'min:0'],
-            'status' => ['required', 'in:Paid,Due,Partial'],
-            'due_date' => ['required', 'date_format:Y-m-d', 'after_or_equal:month'],
-            'paid_at' => ['nullable', 'date_format:Y-m-d H:i:s'],
-        ]);
-
-        // Ensure 'month' is stored as the first day of the month
-        $request->merge(['month' => Carbon::parse($request->month)->startOfMonth()->format('Y-m-d')]);
-
-        $rent->update($request->all());
-
-        return redirect()->route('admin.rents.index')->with('success', 'Rent record updated successfully!');
-    }
-
-    /**
-     * Remove the specified rent record from storage.
-     */
-    public function destroy(Rent $rent) // Using route model binding
-    {
-        $rent->delete();
-
-        return redirect()->route('admin.rents.index')->with('success', 'Rent record deleted successfully!');
+        // Stream the PDF to the browser or download it
+        return $pdf->stream('invoice_rent_' . $rent->id . '_' . $rent->month->format('Y-m') . '.pdf');
     }
 }
 
