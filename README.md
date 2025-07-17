@@ -61,12 +61,15 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
 ## Rental Management System - Admin Panel
+
 This project is a comprehensive Rental Management System (Admin Panel) built using the Laravel framework. It provides administrators with a robust and intuitive interface to manage various aspects of a rental business, focusing specifically on the backend operations without a tenant-facing portal.
 
 ## Project Overview
+
 The primary goal of this system is to streamline the administrative tasks associated with property rentals, offering a centralized platform for managing rooms, room types, tenants, rent records, payments, and maintenance requests. It is designed for single or multiple administrators (with role-based access for Super Admins) to efficiently oversee rental operations.
 
 ## Key Features
+
 The system is built around a CRUD (Create, Read, Update, Delete) paradigm for core entities and includes the following functionalities:
 
 * Dashboard:
@@ -75,151 +78,153 @@ The system is built around a CRUD (Create, Read, Update, Delete) paradigm for co
 
   * Features a dynamic Monthly Revenue Chart (powered by Chart.js) displaying financial performance over the last 12 months.
 
-- Room Management:
+* Room Management:
 
-* Add/Edit/Delete Rooms: Full CRUD capabilities for individual rooms.
+  * Add/Edit/Delete Rooms: Full CRUD capabilities for individual rooms.
 
-* Room Details: Manages room_number, room_type, status (available, occupied, under maintenance), and price.
+  * Room Details: Manages `room_number`, `room_type`, `status` (available, occupied, under maintenance), and `price`.
 
-* Room Type Assignment: Allows assigning rooms to predefined room types.
+  * Room Type Assignment: Allows assigning rooms to predefined room types.
 
-  # Room Type Management:
+* Room Type Management:
 
-* Create/Edit/Delete Room Types: Manages categories of rooms (e.g., Single, Double, AC, Non-AC).
+  * Create/Edit/Delete Room Types: Manages categories of rooms (e.g., Single, Double, AC, Non-AC).
 
-*Default Pricing: Assigns a default_price to each room type, which can be overridden at the individual room level.
+  *Default Pricing: Assigns a `default_price` to each room type, which can be overridden at the individual room level.
 
-  # Tenant Management:
+* Tenant Management:
 
-* Register/Edit Tenants: Comprehensive management of tenant information including full_name, email, phone, address, gender, and start_date.
+  * Register/Edit Tenants: Comprehensive management of tenant information including `full_name`, `email`, `phone`, `address`, `gender`, and `start_date`.
 
-* Room Assignment: Facilitates assigning tenants to available rooms, automatically updating room status.
+  * Room Assignment: Facilitates assigning tenants to available rooms, automatically updating room status.
 
-  # Rent Management:
+* Rent Management:
 
-Record Rent: Allows administrators to manually record monthly rent charges for tenants.
+  * Record Rent: Allows administrators to manually record monthly rent charges for tenants.
 
-Track Payment Status: Monitors rent status (Paid, Due, Partial).
+  * Track Payment Status: Monitors rent status (Paid, Due, Partial).
 
-Invoice Generation (Conceptual): Designed to support future invoice generation based on rent records.
+  * Invoice Generation (Conceptual): Designed to support future invoice generation based on rent records.
 
-Payment Management:
+* Payment Management:
 
-Record Payments: Logs individual payment transactions.
+  * Record Payments: Logs individual payment transactions.
 
-View Payment History: Provides a detailed history of payments by tenant, with filtering options by month and payment method.
+  * View Payment History: Provides a detailed history of payments by tenant, with filtering options by month and payment method.
 
-Rent Status Update: Payments automatically update the status of associated rent records (e.g., from 'Due' to 'Partial' or 'Paid').
+  * Rent Status Update: Payments automatically update the status of associated rent records (e.g., from 'Due' to 'Partial' or 'Paid').
 
-Maintenance Request Management:
+* Maintenance Request Management:
 
-View/Update Requests: Allows administrators to view all maintenance requests and update their status (Pending, In Progress, Completed, Cancelled).
+  * View/Update Requests: Allows administrators to view all maintenance requests and update their status (Pending, In Progress, Completed, Cancelled).
 
-Admin Notes: Ability to add internal notes to requests.
+  * Admin Notes: Ability to add internal notes to requests.
 
-Admin User Management (SuperAdmin only):
+* Admin User Management (SuperAdmin only):
 
-Role-Based Access: Implements a super_admin role with exclusive access to manage other admin_tenant accounts.
+  * Role-Based Access: Implements a `super_admin` role with exclusive access to manage other `admin_tenant` accounts.
 
-Create/Edit/Delete Admin Tenants: Super Admins can create new admin users, update their details, and delete them (with safeguards to prevent self-deletion or super admin deletion).
+  * Create/Edit/Delete Admin Tenants: Super Admins can create new admin users, update their details, and delete them (with safeguards to prevent self-deletion or super admin deletion).
 
-Admin Profile & Settings:
+* Admin Profile & Settings:
 
-Allows the logged-in administrator to update their personal details (name, email) and change their password.
+  * Allows the logged-in administrator to update their personal details (name, email) and change their password.
 
-Profile Image Upload: Supports uploading and managing a profile image for the admin user, with a Gravatar fallback.
+  * Profile Image Upload: Supports uploading and managing a profile image for the admin user, with a Gravatar fallback.
 
-Technologies Used
-Framework: Laravel 10+
+## Technologies Used
 
-Database: MySQL
+* Framework: Laravel 10+
 
-Authentication: Laravel Breeze (Blade with Alpine.js)
+* Database: MySQL
 
-Frontend Styling: Tailwind CSS
+* Authentication: Laravel Breeze (Blade with Alpine.js)
 
-Charting: Chart.js
+* Frontend Styling: Tailwind CSS
 
-PHP Libraries: Carbon (for date/time handling), Laravel Eloquent ORM
+* Charting: Chart.js
 
-Authorization: Laravel Gates
+* PHP Libraries: Carbon (for date/time handling), Laravel Eloquent ORM
 
-Installation & Setup
+* Authorization: Laravel Gates
+
+## Installation & Setup
 To set up and run this project locally:
 
-1. Prerequisites
+### 1. Prerequisites
 Ensure you have the following software installed on your system:
 
-PHP (8.2 or higher): Laravel 10+ requires PHP 8.2 or newer.
+* PHP (8.2 or higher): Laravel 10+ requires PHP 8.2 or newer.
 
-Composer: PHP dependency manager. Download Composer
+* Composer: PHP dependency manager. [Download Composer](...)
 
-Node.js & npm: For frontend asset compilation. Download Node.js (includes npm)
+* Node.js & npm: For frontend asset compilation. [Download Node.js (includes npm)](...)
 
-MySQL Database Server: Or another compatible database (e.g., MariaDB).
+* MySQL Database Server: Or another compatible database (e.g., MariaDB).
 
-Web Server (e.g., Apache, Nginx): Or use Laravel's built-in development server. If using XAMPP/WAMP/Laragon, these are usually included.
+* Web Server (e.g., Apache, Nginx): Or use Laravel's built-in development server. If using XAMPP/WAMP/Laragon, these are usually included.
 
-Git: For cloning the repository. Download Git
+* Git: For cloning the repository. [Download Git](...)
 
-PowerShell Execution Policy (Windows only): If you encounter errors running npm or php artisan commands, you might need to adjust PowerShell's execution policy. Open PowerShell as Administrator and run:
+* PowerShell Execution Policy (Windows only): If you encounter errors running `npm` or `php artisan` commands, you might need to adjust PowerShell's execution policy. Open PowerShell as Administrator and run:
 
+```
 Set-ExecutionPolicy RemoteSigned
+```
+Type `Y` to confirm, then close the admin PowerShell and open a new regular one.
 
-Type Y to confirm, then close the admin PowerShell and open a new regular one.
-
-2. Clone the Repository
+### 2. Clone the Repository
 First, clone the project from GitHub to your local machine:
-
+```
 git clone <YOUR_GITHUB_REPOSITORY_URL> rental-management
 cd rental-management
+```
+(Replace `<YOUR_GITHUB_REPOSITORY_URL>` with the actual URL of your project's GitHub repository.)
 
-(Replace <YOUR_GITHUB_REPOSITORY_URL> with the actual URL of your project's GitHub repository.)
-
-3. Install PHP Dependencies
+### 3. Install PHP Dependencies
 Install all the backend dependencies using Composer:
-
+```
 composer install
-
-4. Install Node.js Dependencies
+```
+### 4. Install Node.js Dependencies
 Install all the frontend dependencies using npm:
-
+```
 npm install
-
-5. Configure Environment Variables
+```
+### 5. Configure Environment Variables
 Create your environment configuration file by copying the example:
-
+```
 cp .env.example .env
 # If using PowerShell and 'cp' doesn't work, try:
 # Copy-Item .\.env.example .\.env
+```
+Then, open the newly created `.env` file in a text editor and update the following sections:
 
-Then, open the newly created .env file in a text editor and update the following sections:
-
-a. Application Key
+### a. Application Key
 Generate a unique application key:
-
+```
 php artisan key:generate
 # If using PowerShell and 'artisan' doesn't work, try:
 # .\php artisan key:generate
-
-b. Database Connection
+```
+### b. Database Connection
 Configure your MySQL database credentials. Make sure your MySQL server is running and the database name exists.
-
+```
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1  # Usually localhost or 127.0.0.1
 DB_PORT=3306       # Default MySQL port
 DB_DATABASE=rental_management_db  # Choose a name for your database
 DB_USERNAME=root                  # Your MySQL username
 DB_PASSWORD=                      # Your MySQL password (leave blank if no password)
-
+```
 Troubleshooting Database Connection: If you get "No connection could be made because the target machine actively refused it", ensure your MySQL server (e.g., via XAMPP control panel) is running.
 
-c. Mail Configuration (for Password Reset)
+### c. Mail Configuration (for Password Reset)
 Configure your mail driver. For local development, Mailpit is highly recommended.
 
 Using Mailpit (Recommended for Local Development):
-If you have Mailpit running (e.g., via Docker, or separately on localhost:1025), use these settings:
-
+If you have Mailpit running (e.g., via Docker, or separately on `localhost:1025`), use these settings:
+```
 MAIL_MAILER=smtp
 MAIL_HOST=localhost
 MAIL_PORT=1025
@@ -228,10 +233,10 @@ MAIL_PASSWORD=null
 MAIL_ENCRYPTION=null
 MAIL_FROM_ADDRESS="no-reply@yourdomain.com" # Your application's "from" address
 MAIL_FROM_NAME="${APP_NAME}"
-
-Using a Real SMTP Service (e.g., Gmail, Mailtrap, SendGrid):
+```
+### Using a Real SMTP Service (e.g., Gmail, Mailtrap, SendGrid):
 Replace with your actual service credentials.
-
+```
 MAIL_MAILER=smtp
 MAIL_HOST=smtp.mailtrap.io # Example: smtp.gmail.com, smtp.sendgrid.net
 MAIL_PORT=2525             # Example: 465 (SSL) / 587 (TLS) for others
@@ -240,88 +245,89 @@ MAIL_PASSWORD=your_smtp_password
 MAIL_ENCRYPTION=tls        # Or 'ssl'
 MAIL_FROM_ADDRESS="your_app_email@example.com"
 MAIL_FROM_NAME="${APP_NAME}"
-
-6. Run Database Migrations and Seeders
-This step will create all necessary database tables and populate them with initial data (including super_admin, admin_tenant, and tenant users, along with sample room types, rooms, tenants, rents, payments, and maintenance requests).
-
+```
+### 6. Run Database Migrations and Seeders
+This step will create all necessary database tables and populate them with initial data (including `super_admin`, `admin_tenant`, and `tenant` users, along with sample room types, rooms, tenants, rents, payments, and maintenance requests).
+```
 php artisan migrate:fresh --seed
 # If using PowerShell and 'artisan' doesn't work, try:
 # .\php artisan migrate:fresh --seed
-
-7. Create Storage Link
-This command creates a symbolic link from public/storage to storage/app/public, which is essential for making uploaded files (like profile images) publicly accessible via URL.
-
+```
+### 7. Create Storage Link
+This command creates a symbolic link from `public/storage` to `storage/app/public`, which is essential for making uploaded files (like profile images) publicly accessible via URL.
+```
 php artisan storage:link
 # If using PowerShell and 'artisan' doesn't work, try:
 # .\php artisan storage:link
-
-8. Compile Frontend Assets
+```
+### 8. Compile Frontend Assets
 Compile your Tailwind CSS and JavaScript assets.
-
+```
 npm run dev
 # Or for production-ready assets:
 # npm run build
-
-9. Start the Development Server
+```
+### 9. Start the Development Server
 You can use Laravel's built-in development server to run your application:
-
+```
 php artisan serve
 # If using PowerShell and 'artisan' doesn't work, try:
 # .\php artisan serve
-
-How to Use the Application
+```
+## How to Use the Application
 Once the development server is running, access the application in your web browser:
 
-Access the Login Page: Open http://127.0.0.1:8000/ in your browser.
+### 1. Access the Login Page: Open `http://127.0.0.1:8000/` in your browser.
 
-Login with Admin Credentials: Use the following default credentials (or your custom seeded ones):
+### 2. Login with Admin Credentials: Use the following default credentials (or your custom seeded ones):
 
-Super Admin (Full Rights):
+* Super Admin (Full Rights):
 
-Email: superadmin@example.com
+  * Email: `superadmin@example.com`
 
-Password: password
+  * Password: `password`
 
-Admin Tenant (Admin Panel Access, No Admin User Creation):
+* Admin Tenant (Admin Panel Access, No Admin User Creation):
 
-Email: admin@example.com
+  * Email: `admin@example.com`
 
-Password: password
+  * Password: `password`
 
-Tenant (No Admin Panel Access):
+* Tenant (No Admin Panel Access):
 
-Email: tenant@example.com
+  * Email: `tenant@example.com`
 
-Password: password
-(Note: If you try to log in as a 'Tenant' and access admin pages, you will be redirected or denied access as per the role-based security.)
+  * Password: `password`
+    (Note: If you try to log in as a 'Tenant' and access admin pages, you will be redirected or denied access as per the role-based security.)
 
-Explore the Dashboard: After successful login, you'll be redirected to the Admin Dashboard (/admin/dashboard), showing key metrics and a revenue chart.
+### 3. Explore the Dashboard: After successful login, you'll be redirected to the Admin Dashboard (`/admin/dashboard`), showing key metrics and a revenue chart.
 
-Navigate Modules: Use the sidebar to navigate through different management sections:
+### 4. Navigate Modules: Use the sidebar to navigate through different management sections:
 
-Rooms: Add, edit, delete, and view rental rooms.
+* Rooms: Add, edit, delete, and view rental rooms.
 
-Room Types: Manage categories and default pricing for rooms.
+* Room Types: Manage categories and default pricing for rooms.
 
-Tenants: Register new tenants, assign them to rooms, and manage their details.
+* Tenants: Register new tenants, assign them to rooms, and manage their details.
 
-Rents: Record monthly rent charges and track their status.
+* Rents: Record monthly rent charges and track their status.
 
-Payments: Record individual payments and view payment history.
+* Payments: Record individual payments and view payment history.
 
-Maintenance: View and update the status of maintenance requests.
+* Maintenance: View and update the status of maintenance requests.
 
-Manage Admins (SuperAdmin Only): Create, edit, and delete other admin_tenant accounts.
+* Manage Admins (SuperAdmin Only): Create, edit, and delete other     `admin_tenant` accounts.
 
-Manage Your Profile: Click on your avatar/name in the top right corner to access "Settings" (/profile), where you can update your name, email, password, and profile image.
+### 5. Manage Your Profile: Click on your avatar/name in the top right corner to access "Settings" (`/profile`), where you can update your name, email, password, and profile image.
 
-Future Enhancements
-Tenant-facing portal for viewing rent, payments, and submitting maintenance requests.
+* Future Enhancements
 
-Automated rent generation.
+  * Tenant-facing portal for viewing rent, payments, and submitting maintenance requests.
 
-Advanced reporting and export options (PDF/CSV).
+  * Automated rent generation.
 
-Notification system for overdue rents or new maintenance requests.
+  * Advanced reporting and export options (PDF/CSV).
 
-More robust search and filtering options across all modules.
+  * Notification system for overdue rents or new maintenance requests.
+
+  * More robust search and filtering options across all modules.
