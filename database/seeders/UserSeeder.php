@@ -16,10 +16,10 @@ class UserSeeder extends Seeder
     {
         // Create a Super Admin user
         User::firstOrCreate(
-            ['email' => 'dngdarong@gmail.com'],
+            ['email' => 'superadmin@gmail.com'],
             [
-                'name' => 'Dong Darong',
-                'password' => Hash::make('rong551020'), // Choose a strong password
+                'name' => 'Super Admin',
+                'password' => Hash::make('superadmin123'), // Choose a strong password
                 'email_verified_at' => now(),
                 'role' => 'super_admin', // Set role to super_admin
             ]
@@ -30,7 +30,7 @@ class UserSeeder extends Seeder
             ['email' => 'admin@example.com'],
             [
                 'name' => 'Admin User',
-                'password' => Hash::make('admin5555'), // Choose a strong password
+                'password' => Hash::make('admin123'), // Choose a strong password
                 'email_verified_at' => now(),
                 'role' => 'admin_tenant', // Set role to admin_tenant
             ]
@@ -41,7 +41,7 @@ class UserSeeder extends Seeder
             ['email' => 'tenant@example.com'],
             [
                 'name' => 'tenant',
-                'password' => Hash::make('tenant5555'), 
+                'password' => Hash::make('tenant123'), 
                 'email_verified_at' => now(),
                 'role' => 'admin_tenant', // Assign your personal user as admin_tenant
             ]
