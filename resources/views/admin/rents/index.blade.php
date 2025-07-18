@@ -108,6 +108,41 @@
         .modal-footer button:hover {
             background-color: #4338ca;
         }
+        .navbar {
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        /* Dropdown specific styles */
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #ffffff;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            top: calc(100% + 0.5rem); /* Position below the avatar */
+        }
+        .dropdown-menu.show {
+            display: block;
+        }
+        .dropdown-menu a, .dropdown-menu button {
+            color: #333;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            text-align: left;
+            width: 100%;
+            border: none;
+            background: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .dropdown-menu a:hover, .dropdown-menu button:hover {
+            background-color: #f1f1f1;
+        }
     </style>
 </head>
 <body class="flex min-h-screen"
@@ -124,6 +159,12 @@
                         <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-3 {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001 1h3v-3m-3 3h3v-3m-3 0V9m0 3h3"></path></svg>
                             <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="{{ route('admin.admin-tenants.index') }}" class="flex items-center space-x-3 {{ request()->routeIs('admin.admin-tenants.*') ? 'active' : '' }}">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a4 4 0 00-4-4H9a4 4 0 00-4 4v1h10zm-9-9a4 4 0 110 5.292"></path></svg>
+                            <span>Add Admins</span> 
                         </a>
                     </li>
                     <li class="mb-2">
@@ -179,7 +220,7 @@
     <div class="flex-1 flex flex-col">
         <!-- Top Navbar -->
         <header class="navbar p-4 flex justify-between items-center relative">
-            <h1 class="text-2xl font-semibold text-gray-800">Manage Payments</h1> {{-- Dynamic title --}}
+            <h1 class="text-2xl font-semibold text-gray-800">Manage Rents</h1> {{-- Dynamic title --}}
             
             <div class="relative">
                 <button id="profileDropdownToggle" class="flex items-center space-x-2 focus:outline-none">
@@ -204,48 +245,10 @@
 
         <!-- Page Content -->
         <main class="flex-1 p-6 bg-gray-100">
-            <div class="flex justify-between items-center mb-6">
-                <a href="{{ route('admin.payments.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                    Record New Payment
+            <div class="flex justify-end mb-6">
+                <a href="{{ route('admin.rents.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                    Add New Rent Record
                 </a>
-                
-                {{-- Filters Section --}}
-                <form method="GET" action="{{ route('admin.payments.index') }}" class="flex items-center space-x-4">
-                    <div>
-                        <label for="tenant_id_filter" class="sr-only">Filter by Tenant</label>
-                        <select name="tenant_id" id="tenant_id_filter" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                            <option value="">All Tenants</option>
-                            @foreach ($tenants as $tenantOption)
-                                <option value="{{ $tenantOption->id }}" {{ request('tenant_id') == $tenantOption->id ? 'selected' : '' }}>
-                                    {{ $tenantOption->full_name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label for="month_filter" class="sr-only">Filter by Month</label>
-                        <input type="month" name="month" id="month_filter" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="{{ request('month') }}">
-                    </div>
-                    <div>
-                        <label for="payment_method_filter" class="sr-only">Filter by Method</label>
-                        <select name="payment_method" id="payment_method_filter" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                            <option value="">All Methods</option>
-                            @foreach ($paymentMethods as $method)
-                                <option value="{{ $method }}" {{ request('payment_method') == $method ? 'selected' : '' }}>
-                                    {{ $method }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-300 focus:bg-gray-300 active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                        Filter
-                    </button>
-                    @if (request()->hasAny(['tenant_id', 'month', 'payment_method']))
-                        <a href="{{ route('admin.payments.index') }}" class="inline-flex items-center px-4 py-2 bg-red-100 border border-transparent rounded-md font-semibold text-xs text-red-700 uppercase tracking-widest hover:bg-red-200 focus:bg-red-200 active:bg-red-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                            Clear Filters
-                        </a>
-                    @endif
-                </form>
             </div>
 
             <div class="card p-6">
@@ -255,27 +258,34 @@
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-lg">Tenant</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Room</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rent Month</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Month</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Method</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Date</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            @forelse ($payments as $payment)
+                            @forelse ($rents as $rent)
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $payment->tenant->full_name }}</td>
-                                    {{-- Use nullsafe operator for rent and room relationships --}}
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $payment->rent?->room?->room_number ?? 'N/A' }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $payment->rent?->month?->format('M Y') ?? 'N/A' }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${{ number_format($payment->amount, 2) }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $payment->payment_method }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $payment->payment_date->format('M d, Y H:i A') }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $rent->tenant->full_name }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $rent->room->room_number }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $rent->month->format('M Y') }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${{ number_format($rent->amount, 2) }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                                            @if($rent->status == 'Paid') bg-green-100 text-green-800
+                                            @elseif($rent->status == 'Due') bg-red-100 text-red-800
+                                            @else bg-yellow-100 text-yellow-800 @endif">
+                                            {{ $rent->status }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $rent->due_date->format('M d, Y') }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <a href="{{ route('admin.payments.edit', $payment) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
-                                        <button type="button" onclick="confirmDelete('{{ $payment->id }}')" class="text-red-600 hover:text-red-900">Delete</button>
-                                        <form id="delete-form-{{ $payment->id }}" action="{{ route('admin.payments.destroy', $payment) }}" method="POST" style="display: none;">
+                                        <a href="{{ route('admin.rents.edit', $rent) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
+                                        {{-- Removed the PDF button --}}
+                                        <button type="button" onclick="confirmDelete('{{ $rent->id }}')" class="text-red-600 hover:text-red-900">Delete</button>
+                                        <form id="delete-form-{{ $rent->id }}" action="{{ route('admin.rents.destroy', $rent) }}" method="POST" style="display: none;">
                                             @csrf
                                             @method('DELETE')
                                         </form>
@@ -283,14 +293,14 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No payments found.</td>
+                                    <td colspan="7" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No rent records found.</td>
                                 </tr>
                             @endforelse
                         </tbody>
                     </table>
                 </div>
                 <div class="mt-4 pagination-links">
-                    {{ $payments->appends(request()->query())->links() }} {{-- Append filters to pagination links --}}
+                    {{ $rents->appends(request()->query())->links() }}
                 </div>
             </div>
         </main>
@@ -311,7 +321,7 @@
     <div id="confirmDeleteModal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">Confirm Deletion</div>
-            <div class="modal-body">Are you sure you want to delete this payment? This action cannot be undone.</div>
+            <div class="modal-body">Are you sure you want to delete this rent record? This action cannot be undone.</div>
             <div class="modal-footer flex justify-center">
                 <button id="cancelDelete" class="cancel-btn">Cancel</button>
                 <button id="confirmDelete" class="primary-button">Delete</button>
@@ -382,8 +392,8 @@
             const confirmDeleteBtn = document.getElementById('confirmDelete');
             let formToSubmit = null; // To store the form reference
 
-            window.confirmDelete = function(paymentId) { // Changed parameter name to paymentId
-                formToSubmit = document.getElementById('delete-form-' + paymentId);
+            window.confirmDelete = function(rentId) { // Changed parameter name to rentId
+                formToSubmit = document.getElementById('delete-form-' + rentId);
                 confirmDeleteModal.classList.add('show');
             }
 

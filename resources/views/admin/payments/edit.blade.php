@@ -137,7 +137,7 @@
     <div class="flex-1 flex flex-col">
         <!-- Top Navbar -->
         <header class="navbar p-4 flex justify-between items-center relative">
-            <h1 class="text-2xl font-semibold text-gray-800">Manage Payments</h1> {{-- Dynamic title --}}
+            <h1 class="text-2xl font-semibold text-gray-800">Edit Payment Record</h1> {{-- Dynamic title --}}
             
             <div class="relative">
                 <button id="profileDropdownToggle" class="flex items-center space-x-2 focus:outline-none">
@@ -162,161 +162,92 @@
 
         <!-- Page Content -->
         <main class="flex-1 p-6 bg-gray-100">
-            <div class="flex justify-between items-center mb-6">
-                <a href="{{ route('admin.payments.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                    Record New Payment
-                </a>
-                
-                {{-- Filters Section --}}
-                <form method="GET" action="{{ route('admin.payments.index') }}" class="flex items-center space-x-4">
-                    <div>
-                        <label for="tenant_id_filter" class="sr-only">Filter by Tenant</label>
-                        <select name="tenant_id" id="tenant_id_filter" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                            <option value="">All Tenants</option>
-                            @foreach ($tenants as $tenantOption)
-                                <option value="{{ $tenantOption->id }}" {{ request('tenant_id') == $tenantOption->id ? 'selected' : '' }}>
-                                    {{ $tenantOption->full_name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label for="month_filter" class="sr-only">Filter by Month</label>
-                        <input type="month" name="month" id="month_filter" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="{{ request('month') }}">
-                    </div>
-                    <div>
-                        <label for="payment_method_filter" class="sr-only">Filter by Method</label>
-                        <select name="payment_method" id="payment_method_filter" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                            <option value="">All Methods</option>
-                            @foreach ($paymentMethods as $method)
-                                <option value="{{ $method }}" {{ request('payment_method') == $method ? 'selected' : '' }}>
-                                    {{ $method }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-300 focus:bg-gray-300 active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                        Filter
-                    </button>
-                    @if (request()->hasAny(['tenant_id', 'month', 'payment_method']))
-                        <a href="{{ route('admin.payments.index') }}" class="inline-flex items-center px-4 py-2 bg-red-100 border border-transparent rounded-md font-semibold text-xs text-red-700 uppercase tracking-widest hover:bg-red-200 focus:bg-red-200 active:bg-red-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                            Clear Filters
-                        </a>
-                    @endif
-                </form>
-            </div>
+            <div class="card p-6 max-w-2xl mx-auto">
+                <form method="POST" action="{{ route('admin.payments.update', $payment) }}">
+                    @csrf
+                    @method('PUT')
 
-            <div class="card p-6">
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="table-header">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-lg">Tenant</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Room</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rent Month</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Method</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Date</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            @forelse ($payments as $payment)
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $payment->tenant->full_name }}</td>
-                                    {{-- Use nullsafe operator for rent and room relationships --}}
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $payment->rent?->room?->room_number ?? 'N/A' }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $payment->rent?->month?->format('M Y') ?? 'N/A' }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${{ number_format($payment->amount, 2) }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $payment->payment_method }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $payment->payment_date->format('M d, Y H:i A') }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <a href="{{ route('admin.payments.edit', $payment) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
-                                        <button type="button" onclick="confirmDelete('{{ $payment->id }}')" class="text-red-600 hover:text-red-900">Delete</button>
-                                        <form id="delete-form-{{ $payment->id }}" action="{{ route('admin.payments.destroy', $payment) }}" method="POST" style="display: none;">
-                                            @csrf
-                                            @method('DELETE')
-                                        </form>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="7" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">No payments found.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-                <div class="mt-4 pagination-links">
-                    {{ $payments->appends(request()->query())->links() }} {{-- Append filters to pagination links --}}
-                </div>
+                    <div class="mb-4">
+                        <label for="tenant_id" class="block text-sm font-medium text-gray-700">Tenant</label>
+                        <select name="tenant_id" id="tenant_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                            <option value="">Select Tenant</option>
+                            @foreach ($tenants as $tenantOption)
+                                <option value="{{ $tenantOption->id }}" {{ old('tenant_id', $payment->tenant_id) == $tenantOption->id ? 'selected' : '' }}>
+                                    {{ $tenantOption->full_name }} (Room: {{ $tenantOption->room->room_number ?? 'N/A' }})
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('tenant_id')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="rent_id" class="block text-sm font-medium text-gray-700">Associated Rent Record (Optional)</label>
+                        <select name="rent_id" id="rent_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <option value="">No Specific Rent</option>
+                            @foreach ($rents as $rentOption)
+                                <option value="{{ $rentOption->id }}" {{ old('rent_id', $payment->rent_id) == $rentOption->id ? 'selected' : '' }}>
+                                    {{ $rentOption->tenant->full_name }} - Room {{ $rentOption->room->room_number ?? 'N/A' }} - {{ $rentOption->month->format('M Y') }} (${{ number_format($rentOption->amount, 2) }})
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('rent_id')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="amount" class="block text-sm font-medium text-gray-700">Amount</label>
+                        <input type="number" name="amount" id="amount" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="{{ old('amount', $payment->amount) }}" required min="0" step="0.01">
+                        @error('amount')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="payment_method" class="block text-sm font-medium text-gray-700">Payment Method</label>
+                        <select name="payment_method" id="payment_method" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                            <option value="">Select Method</option>
+                            @foreach ($paymentMethods as $method)
+                                <option value="{{ $method }}" {{ old('payment_method', $payment->payment_method) == $method ? 'selected' : '' }}>{{ $method }}</option>
+                            @endforeach
+                        </select>
+                        @error('payment_method')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="payment_date" class="block text-sm font-medium text-gray-700">Payment Date & Time</label>
+                        <input type="datetime-local" name="payment_date" id="payment_date" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" value="{{ old('payment_date', $payment->payment_date ? $payment->payment_date->format('Y-m-d\TH:i') : '') }}" required>
+                        @error('payment_date')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="notes" class="block text-sm font-medium text-gray-700">Notes (Optional)</label>
+                        <textarea name="notes" id="notes" rows="3" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">{{ old('notes', $payment->notes) }}</textarea>
+                        @error('notes')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="flex items-center justify-end">
+                        <a href="{{ route('admin.payments.index') }}" class="text-gray-600 hover:text-gray-900 mr-4">Cancel</a>
+                        <button type="submit" class="primary-button">
+                            Update Payment
+                        </button>
+                    </div>
+                </form>
             </div>
         </main>
     </div>
 
-    <!-- Custom Alert Modal Structure -->
-    <div id="customAlertModal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header" id="modalTitle">Alert</div>
-            <div class="modal-body" id="modalMessage"></div>
-            <div class="modal-footer">
-                <button id="closeModal">OK</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Confirmation Modal for Delete -->
-    <div id="confirmDeleteModal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">Confirm Deletion</div>
-            <div class="modal-body">Are you sure you want to delete this payment? This action cannot be undone.</div>
-            <div class="modal-footer flex justify-center">
-                <button id="cancelDelete" class="cancel-btn">Cancel</button>
-                <button id="confirmDelete" class="primary-button">Delete</button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // Custom Alert Modal Logic
+        // Profile Dropdown Logic (from dashboard)
         document.addEventListener('DOMContentLoaded', function() {
-            const modal = document.getElementById('customAlertModal');
-            const modalTitle = document.getElementById('modalTitle');
-            const modalMessage = document.getElementById('modalMessage');
-            const closeModalBtn = document.getElementById('closeModal');
-
-            function showAlert(title, message) {
-                modalTitle.textContent = title;
-                modalMessage.textContent = message;
-                modal.classList.add('show');
-            }
-
-            function hideAlert() {
-                modal.classList.remove('show');
-            }
-
-            if (closeModalBtn) {
-                closeModalBtn.addEventListener('click', hideAlert);
-            }
-            if (modal) {
-                modal.addEventListener('click', function(event) {
-                    if (event.target === modal) {
-                        hideAlert();
-                    }
-                });
-            }
-
-            const bodyElement = document.body;
-            const sessionSuccess = bodyElement.dataset.sessionSuccess;
-            const sessionError = bodyElement.dataset.sessionError;
-
-            if (sessionSuccess) {
-                showAlert('Success!', sessionSuccess);
-            } else if (sessionError) {
-                showAlert('Error!', sessionError);
-            }
-
-            // Profile Dropdown Logic
             const profileDropdownToggle = document.getElementById('profileDropdownToggle');
             const profileDropdownMenu = document.getElementById('profileDropdownMenu');
 
@@ -330,43 +261,6 @@
                         if (profileDropdownMenu.classList.contains('show')) {
                             profileDropdownMenu.classList.remove('show');
                         }
-                    }
-                });
-            }
-
-            // Delete Confirmation Modal Logic
-            const confirmDeleteModal = document.getElementById('confirmDeleteModal');
-            const cancelDeleteBtn = document.getElementById('cancelDelete');
-            const confirmDeleteBtn = document.getElementById('confirmDelete');
-            let formToSubmit = null; // To store the form reference
-
-            window.confirmDelete = function(paymentId) { // Changed parameter name to paymentId
-                formToSubmit = document.getElementById('delete-form-' + paymentId);
-                confirmDeleteModal.classList.add('show');
-            }
-
-            if (cancelDeleteBtn) {
-                cancelDeleteBtn.addEventListener('click', function() {
-                    confirmDeleteModal.classList.remove('show');
-                    formToSubmit = null;
-                });
-            }
-
-            if (confirmDeleteBtn) {
-                confirmDeleteBtn.addEventListener('click', function() {
-                    if (formToSubmit) {
-                        formToSubmit.submit(); // Submit the form
-                    }
-                    confirmDeleteModal.classList.remove('show');
-                    formToSubmit = null;
-                });
-            }
-
-            if (confirmDeleteModal) {
-                confirmDeleteModal.addEventListener('click', function(event) {
-                    if (event.target === confirmDeleteModal) {
-                        confirmDeleteModal.classList.remove('show');
-                        formToSubmit = null;
                     }
                 });
             }
